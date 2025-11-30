@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UG Online Media Radio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        :root {
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --dark: #0f0a1c;
+            --light: #f8fafc;
+            --accent: #06d6a0;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0a1c 0%, #1e133c 50%, #2f2a63 100%);
+            background-size: 400% 400%;
+            animation: background-animate 15s ease infinite;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: white;
+            line-height: 1.6;
+        }
+
+        @keyframes background-animate {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Enhanced Frosted Glass Effect */
+        .frosted-glass {
+            background-color: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .frosted-glass:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+        
+        /* Visualizer Background */
+        .visualizer-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.5;
+            overflow: hidden;
+        }
+        
+        .vu-meter {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            padding: 0 20px;
+        }
+        
+        .vu-bar {
+            width: 3.5%;
+            background: linear-gradient(to top, var(--primary), var(--secondary));
+            border-radius: 4px 4px 0 0;
+            transform-origin: bottom;
+            opacity: 0.7;
+            animation: vu-animation 1.5s ease-in-out infinite alternate;
+            animation-delay: calc(var(--i) * 0.05s);
+        }
+        
+        @keyframes vu-animation {
+            0% { height: 20%; }
+            100% { height: 80%; }
+        }
+        
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            opacity: 0.1;
+            filter: blur(20px);
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -50px) scale(1.2); }
+            50% { transform: translate(0, -100px) scale(0.8); }
+            75% { transform: translate(-50px, -50px) scale(1.1); }
+        }
+
+        /* News Ticker */
+        .news-ticker {
+            position: relative;
+            overflow: hidden;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 9999px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .news-ticker-content {
+            position: absolute;
+            white-space: nowrap;
+            animation: ticker 30s linear infinite;
+        }
+        
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* General Card Styling */
+        .feature-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Ensures cards in the same row can be equal height */
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center p-4 lg:p-8">
+
+    <div class="visualizer-bg" id="visualizer-bg">
+        <div class="vu-meter" id="vu-meter"></div>
+        <div class="floating-element" style="width: 300px; height: 300px; top: 10%; left: 5%; animation-delay: 0s;"></div>
+        <div class="floating-element" style="width: 200px; height: 200px; top: 60%; left: 80%; animation-delay: 2s;"></div>
+    </div>
+
+    <header class="w-full max-w-7xl mb-8">
+        <nav class="frosted-glass rounded-full px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <img src="https://cdn-icons-png.flaticon.com/512/9415/9415424.png" alt="Logo" class="w-10 h-10">
+                <div class="font-extrabold text-xl lg:text-2xl bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400 text-transparent bg-clip-text tracking-wide">
+                    UGONLINEMEDIA
+                </div>
+            </div>
+            <a href="#" class="block py-2 text-gray-100 bg-gradient-to-r from-purple-600 to-indigo-600 px-4 rounded-full shadow-md hover:from-pink-600 hover:to-purple-700 hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold flex items-center">
+                <i class="fas fa-home mr-2"></i>HOME
+            </a>
+        </nav>
+
+        <div class="w-full flex justify-center mt-6">
+            <div class="frosted-glass rounded-3xl p-4 w-full max-w-3xl text-center">
+                <h2 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400 mb-3 drop-shadow-lg">
+                    🎙️ UG Online Media Live
+                </h2>
+                <iframe src="https://radio.menu/stations/ugonlinemedia-com-ugonlinemedia/embed/" width="100%" height="97" scrolling="no" frameborder="no" loading="lazy" class="rounded-xl border-none shadow-md"></iframe>
+                <p class="text-sm text-gray-400 mt-2">
+                    Streaming powered by <a href="https://radio.menu/" target="_blank" class="text-purple-400 hover:underline">Radio.Menu</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="w-full max-w-4xl mx-auto news-ticker">
+            <div class="news-ticker-content text-sm md:text-base text-gray-200 px-4">
+                <span>🔥 Breaking: UG Online Media reaches 10,000 listeners! • 🎉 New show: Tech Talk Tuesdays • 📱 Download our mobile app for exclusive content • 🌟 Like & share your favorite songs! • 🎶 Now Playing: Top Ugandan Hits • 📻 Tune in 24/7 for the best vibes!</span>
+            </div>
+        </div>
+    </header>
+<main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-8 px-4">
+
+    <!-- Left Column -->
+    <div class="flex flex-col gap-8">
+        <div class="frosted-glass p-6 rounded-3xl feature-card">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400">
+                Hello Uganda! 🎉
+            </h1>
+            <p class="text-lg md:text-xl font-semibold text-center text-cyan-200 mt-2">
+                Welcome to Ugonlinemedia App! 📱🌟
+            </p>
+            <p class="text-gray-300 leading-relaxed text-center mt-4">
+                Your ultimate source for:
+            </p>
+            <div class="grid grid-cols-2 gap-4 mt-6">
+                <div class="p-3 rounded-xl bg-purple-600/20 border border-purple-500/40 text-center transition-all hover:scale-105 hover:bg-purple-600/40">🎭 Entertainment</div>
+                <div class="p-3 rounded-xl bg-purple-600/20 border border-purple-500/40 text-center transition-all hover:scale-105 hover:bg-purple-600/40">🏛️ Politics</div>
+                <div class="p-3 rounded-xl bg-purple-600/20 border border-purple-500/40 text-center transition-all hover:scale-105 hover:bg-purple-600/40">🔍 Discoveries</div>
+                <div class="p-3 rounded-xl bg-purple-600/20 border border-purple-500/40 text-center transition-all hover:scale-105 hover:bg-purple-600/40">💻 Tech tips</div>
+            </div>
+        </div>
+
+        <!-- NEW: Local + Online Player Card -->
+        <div class="frosted-glass p-6 rounded-3xl feature-card space-y-6">
+            <!-- Local Offline Player -->
+            <div>
+                <h3 class="text-xl font-bold mb-4 flex items-center text-pink-300">
+                    <i class="fas fa-headphones mr-2"></i> Local Playback
+                </h3>
+                <p class="text-sm text-gray-400 mb-4">
+                    No internet? Play music directly from your device.
+                </p>
+
+                <div class="flex items-center space-x-4 mb-4">
+                    <div id="local-album-art" class="w-20 h-20 bg-gray-700/50 rounded-lg flex items-center justify-center text-3xl text-pink-400 shadow-xl flex-shrink-0">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-lg font-semibold text-white truncate" id="local-song-title">Please load a song...</div>
+                        <div class="text-gray-400 truncate" id="local-artist-name">Local Device Storage</div>
+                    </div>
+                </div>
+
+                <label for="local-file-input" class="cursor-pointer block mb-4">
+                    <div class="text-center py-3 px-6 rounded-full font-bold text-white bg-gradient-to-r from-pink-500 to-purple-600 shadow-lg hover:from-pink-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center">
+                        <i class="fas fa-cloud-upload-alt mr-2"></i> Load Music from Device
+                    </div>
+                    <input type="file" id="local-file-input" accept="audio/*" multiple class="hidden">
+                </label>
+
+                <div class="flex items-center space-x-3 mb-4">
+                    <span id="current-time" class="text-xs text-gray-400">0:00</span>
+                    <input type="range" id="seek-slider" value="0" max="100" class="flex-grow rounded-full">
+                    <span id="duration" class="text-xs text-gray-400">0:00</span>
+                </div>
+
+                <div class="flex justify-center items-center space-x-6">
+                    <button id="prev-btn" class="text-gray-400 hover:text-pink-400 transition-colors duration-200 disabled:opacity-50" disabled>
+                        <i class="fas fa-backward text-2xl"></i>
+                    </button>
+                    <button id="play-pause-btn" class="w-16 h-16 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50" disabled>
+                        <i class="fas fa-play text-2xl" id="play-icon"></i>
+                    </button>
+                    <button id="next-btn" class="text-gray-400 hover:text-pink-400 transition-colors duration-200 disabled:opacity-50" disabled>
+                        <i class="fas fa-forward text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <hr class="border-gray-600/50">
+
+            <!-- Online Radio Player -->
+            <div>
+                <h3 class="text-xl font-bold mb-4 flex items-center text-purple-300">
+                    <i class="fas fa-play-circle mr-2"></i> Now Playing (Radio)
+                </h3>
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-purple-500/20 rounded-xl flex items-center justify-center text-2xl text-purple-300 shadow-inner flex-shrink-0">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-lg font-semibold text-white truncate" id="current-song-radio">Loading...</div>
+                        <div class="text-gray-400 truncate" id="current-artist-radio">UG Online Media</div>
+                    </div>
+                </div>
+            </div>
+
+            <audio id="local-audio-player" src=""></audio>
+        </div>
+
+        <div class="frosted-glass p-6 rounded-3xl feature-card">
+            <h3 class="text-xl font-bold mb-2 flex items-center text-purple-300">
+                <i class="fas fa-info-circle mr-2"></i> About Us
+            </h3>
+            <p class="text-gray-300 leading-relaxed text-sm">
+                UgOnline Radio is your one-stop destination for the latest news, hottest entertainment buzz, insightful political analysis, and tech discoveries. We bring Uganda to the world and the world to Uganda, 24/7.
+            </p>
+        </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="flex flex-col gap-8">
+        <!-- Recently Played -->
+        <div class="frosted-glass p-6 rounded-3xl feature-card">
+            <h3 class="text-xl font-bold mb-4 flex items-center text-purple-300">
+                <i class="fas fa-history mr-2"></i> Recently Played
+            </h3>
+            <div id="recent-tracks" class="space-y-3 max-h-60 overflow-y-auto pr-2">
+                <div class="flex items-center space-x-3 p-2 rounded-lg bg-white/5">
+                     <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-300 flex-shrink-0"><i class="fas fa-music text-sm"></i></div>
+                    <div class="min-w-0">
+                        <div class="font-semibold text-sm truncate">Loading tracks...</div>
+                        <div class="text-xs text-gray-400 truncate">Please wait</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Schedule -->
+        <div class="frosted-glass p-6 rounded-3xl feature-card">
+            <h3 class="text-xl font-bold mb-4 flex items-center text-purple-300">
+                <i class="fas fa-calendar-alt mr-2"></i> Today's Schedule
+            </h3>
+            <div id="schedule-list" class="space-y-3">
+                <div class="p-3 border-l-4 border-purple-500 bg-white/5 rounded-r-lg">
+                    <div class="font-bold text-purple-400">06:00 - 09:00</div>
+                    <div>Morning Show with DJ Mark</div>
+                </div>
+                <div class="p-3 border-l-4 border-purple-500 bg-white/5 rounded-r-lg">
+                    <div class="font-bold text-purple-400">09:00 - 12:00</div>
+                    <div>Top 40 Countdown</div>
+                </div>
+                <div class="p-3 border-l-4 border-purple-500 bg-white/5 rounded-r-lg">
+                    <div class="font-bold text-purple-400">12:00 - 14:00</div>
+                    <div>News Hour</div>
+                </div>
+                <div class="p-3 border-l-4 border-purple-500 bg-white/5 rounded-r-lg">
+                    <div class="font-bold text-purple-400">14:00 - 17:00</div>
+                    <div>Afternoon Drive</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer class="w-full mt-12 px-4">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+
+    <!-- About Card -->
+    <div class="frosted-glass p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300">
+      <h4 class="text-xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400">About UG Online Media</h4>
+      <p class="text-gray-300 text-sm leading-relaxed">
+        Bringing Uganda to the world and the world to Uganda, 24/7. Catch the latest news, entertainment, tech updates, and more.
+      </p>
+    </div>
+
+    <!-- Quick Links Card -->
+    <div class="frosted-glass p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300">
+      <h4 class="text-xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400">Quick Links</h4>
+      <ul class="space-y-2 text-sm text-gray-200">
+        <li><a href="#" class="hover:text-pink-400 transition-colors duration-200">Home</a></li>
+        <li><a href="#" class="hover:text-pink-400 transition-colors duration-200">Live Radio</a></li>
+        <li><a href="#" class="hover:text-pink-400 transition-colors duration-200">Shows & Schedule</a></li>
+        <li><a href="#" class="hover:text-pink-400 transition-colors duration-200">About Us</a></li>
+        <li><a href="#" class="hover:text-pink-400 transition-colors duration-200">Contact</a></li>
+      </ul>
+    </div>
+
+    <!-- Social + Newsletter Card -->
+    <div class="frosted-glass p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300">
+      <h4 class="text-xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400">Stay Connected</h4>
+      
+      <!-- Social Icons -->
+      <div class="flex space-x-4 mb-4">
+        <a href="#" class="hover:text-pink-400 text-2xl transition-colors duration-200"><i class="fab fa-facebook"></i></a>
+        <a href="#" class="hover:text-pink-400 text-2xl transition-colors duration-200"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="hover:text-pink-400 text-2xl transition-colors duration-200"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="hover:text-pink-400 text-2xl transition-colors duration-200"><i class="fab fa-youtube"></i></a>
+      </div>
+
+      <!-- Newsletter Form -->
+      <form class="flex flex-col sm:flex-row gap-2">
+        <input type="email" placeholder="Your email" class="flex-grow px-3 py-2 rounded-full bg-white/10 placeholder-gray-300 text-white focus:bg-white/20 focus:outline-none transition duration-200">
+        <button type="submit" class="px-6 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300">Subscribe</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bottom Footer Note -->
+  <div class="mt-8 text-center text-gray-400 text-xs">
+    &copy; 2025 UG Online Media. All rights reserved.
+  </div>
+</footer>
+
+
+
+
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const audioPlayer = document.getElementById('local-audio-player');
+        const fileInput = document.getElementById('local-file-input');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const playIcon = document.getElementById('play-icon');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const seekSlider = document.getElementById('seek-slider');
+        const currentTimeEl = document.getElementById('current-time');
+        const durationEl = document.getElementById('duration');
+        const songTitleEl = document.getElementById('local-song-title');
+        const artistEl = document.getElementById('local-artist-name');
+
+        let playlist = [];
+        let currentIndex = 0;
+
+        fileInput.addEventListener('change', (e) => {
+            playlist = Array.from(e.target.files);
+            if (playlist.length > 0) {
+                currentIndex = 0;
+                loadSong(currentIndex);
+                playPauseBtn.disabled = false;
+                prevBtn.disabled = false;
+                nextBtn.disabled = false;
+            }
+        });
+
+        function loadSong(index) {
+            const file = playlist[index];
+            audioPlayer.src = URL.createObjectURL(file);
+            songTitleEl.textContent = file.name;
+            artistEl.textContent = 'Local Track';
+            audioPlayer.load();
+        }
+
+        playPauseBtn.addEventListener('click', () => {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                playIcon.classList.replace('fa-play', 'fa-pause');
+            } else {
+                audioPlayer.pause();
+                playIcon.classList.replace('fa-pause', 'fa-play');
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadSong(currentIndex);
+                audioPlayer.play();
+                playIcon.classList.replace('fa-play', 'fa-pause');
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < playlist.length - 1) {
+                currentIndex++;
+                loadSong(currentIndex);
+                audioPlayer.play();
+                playIcon.classList.replace('fa-play', 'fa-pause');
+            }
+        });
+
+        audioPlayer.addEventListener('timeupdate', () => {
+            if (audioPlayer.duration) {
+                const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                seekSlider.value = progress;
+                currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+                durationEl.textContent = formatTime(audioPlayer.duration);
+            }
+        });
+
+        seekSlider.addEventListener('input', () => {
+            if (audioPlayer.duration) {
+                audioPlayer.currentTime = (seekSlider.value / 100) * audioPlayer.duration;
+            }
+        });
+
+        function formatTime(time) {
+            const mins = Math.floor(time / 60);
+            const secs = Math.floor(time % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+    });
+</script>
+</body>
+</html>
