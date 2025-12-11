@@ -3,11 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8b5cf6">
     <title>UG Online Media Radio</title>
+    
+    <!-- Preconnect for faster loading -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com/ajax/libs">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    
+    <!-- Add manifest for PWA -->
+    <link rel="manifest" href="/manifest.json">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Preload critical CSS -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        /* Critical CSS for preloader */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .preloader-content {
+            text-align: center;
+        }
+        
+        .preloader-logo {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #8b5cf6, #ec4899, #06d6a0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradient-shift 3s ease infinite;
+            margin-bottom: 1rem;
+        }
+        
+        .preloader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(139, 92, 246, 0.2);
+            border-top: 4px solid #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        .loading-text {
+            color: #c7d2fe;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+    </style>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         
         :root {
             --primary: #8b5cf6;
@@ -15,6 +75,11 @@
             --dark: #0f0a1c;
             --light: #f8fafc;
             --accent: #06d6a0;
+            --bg-primary: #0f0a1c;
+            --bg-secondary: #1e133c;
+            --text-primary: #ffffff;
+            --text-secondary: #c7d2fe;
+            --card-bg: rgba(255, 255, 255, 0.07);
         }
         
         * {
@@ -25,13 +90,53 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f0a1c 0%, #1e133c 50%, #2f2a63 100%);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, #2f2a63 100%);
             background-size: 400% 400%;
             animation: background-animate 15s ease infinite;
             min-height: 100vh;
             overflow-x: hidden;
-            color: white;
+            color: var(--text-primary);
             line-height: 1.6;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            padding-top: 80px; /* Space for fixed navbar */
+        }
+
+        body.light-theme {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #c7d2fe 100%);
+            --primary: #7c3aed;
+            --secondary: #db2777;
+        }
+
+        /* Enhanced Light Theme Colors */
+        .light-theme .frosted-glass {
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(139, 92, 246, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+        }
+        
+        .light-theme .modern-card {
+            background: linear-gradient(145deg, rgba(139, 92, 246, 0.08), rgba(236, 72, 153, 0.04));
+            border: 1px solid rgba(139, 92, 246, 0.1);
+        }
+        
+        .light-theme .live-badge {
+            background: linear-gradient(45deg, #dc2626, #ea580c);
+            color: white;
+        }
+        
+        .light-theme .hero-title {
+            background: linear-gradient(45deg, #7c3aed, #db2777, #059669);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradient-shift 3s ease infinite;
         }
 
         @keyframes background-animate {
@@ -40,22 +145,132 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* Fixed Navigation Bar */
+        .fixed-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            background: rgba(15, 10, 28, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            transform: translateY(0);
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+        
+        .light-theme .fixed-nav {
+            background: rgba(248, 250, 252, 0.95);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+        }
+        
+        .nav-hidden {
+            transform: translateY(-100%);
+        }
+
         /* Enhanced Frosted Glass Effect */
         .frosted-glass {
-            background-color: rgba(255, 255, 255, 0.07);
+            background-color: var(--card-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            transition: all 0.3s ease-in-out;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .light-theme .frosted-glass:hover {
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
         }
         
         .frosted-glass:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-            border-color: rgba(139, 92, 246, 0.5);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        /* Floating Buttons */
+        .floating-btn {
+            position: fixed;
+            z-index: 100;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
         }
         
+        .floating-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            bottom: 100px;
+            right: 25px;
+            font-size: 28px;
+        }
+        
+        .ai-assistant-btn {
+            background: linear-gradient(45deg, #8b5cf6, #ec4899);
+            color: white;
+            bottom: 170px;
+            right: 25px;
+            font-size: 24px;
+        }
+        
+        .ai-panel {
+            position: fixed;
+            bottom: 240px;
+            right: 25px;
+            width: 350px;
+            max-width: calc(100vw - 50px);
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            z-index: 99;
+            display: none;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .ai-panel.active {
+            display: block;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Particle Background */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            opacity: 0.15;
+            filter: blur(2px);
+        }
+
         /* Visualizer Background */
         .visualizer-bg {
             position: fixed;
@@ -64,7 +279,7 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            opacity: 0.5;
+            opacity: 0.3;
             overflow: hidden;
         }
         
@@ -80,35 +295,18 @@
         }
         
         .vu-bar {
-            width: 3.5%;
+            width: 2.5%;
             background: linear-gradient(to top, var(--primary), var(--secondary));
             border-radius: 4px 4px 0 0;
             transform-origin: bottom;
-            opacity: 0.7;
+            opacity: 0.6;
             animation: vu-animation 1.5s ease-in-out infinite alternate;
             animation-delay: calc(var(--i) * 0.05s);
         }
         
         @keyframes vu-animation {
-            0% { height: 20%; }
-            100% { height: 80%; }
-        }
-        
-        /* Floating Elements */
-        .floating-element {
-            position: absolute;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            opacity: 0.1;
-            filter: blur(20px);
-            animation: float 15s infinite ease-in-out;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(50px, -50px) scale(1.2); }
-            50% { transform: translate(0, -100px) scale(0.8); }
-            75% { transform: translate(-50px, -50px) scale(1.1); }
+            0% { height: 10%; }
+            100% { height: 70%; }
         }
 
         /* News Ticker */
@@ -135,340 +333,2541 @@
             100% { transform: translateX(-100%); }
         }
 
-        /* General Card Styling */
-        .feature-card {
+        /* Modern Card Styles */
+        .modern-card {
+            background: linear-gradient(145deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modern-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .modern-card:hover::before {
+            opacity: 1;
+        }
+
+        .modern-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(139, 92, 246, 0.25);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        /* Hero Section Animation */
+        .hero-title {
+            background: linear-gradient(45deg, #8b5cf6, #ec4899, #06d6a0);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradient-shift 3s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Live Now Badge */
+        .live-badge {
+            position: relative;
+            background: linear-gradient(45deg, #ef4444, #f97316);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: translateX(150%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 9999;
+            max-width: 350px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 320px;
+            height: 100vh;
+            background: rgba(15, 10, 28, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 80px 24px 24px;
+        }
+        
+        .light-theme .mobile-menu {
+            background: rgba(248, 250, 252, 0.98);
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        /* Volume Slider */
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        /* Podcast and YouTube Card Hover Effects */
+        .media-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .media-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+        }
+
+        .media-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: inherit;
+        }
+
+        .media-card:hover::after {
+            opacity: 1;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
+
+        .progress-bar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Shimmer Effect */
+        .shimmer {
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                transparent 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Offline Indicator */
+        .offline-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #ef4444;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 9998;
+        }
+
+        .offline-indicator.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Big and Bold Fonts */
+        .big-bold {
+            font-size: 2.5rem;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .body-large {
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+
+        /* Metrics Display */
+        .metrics-card {
+            background: linear-gradient(145deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.1));
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            backdrop-filter: blur(20px);
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Team Cards */
+        .team-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+        }
+        
+        .team-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+        }
+        
+        .team-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(139, 92, 246, 0.2);
+            margin-bottom: 1rem;
+        }
+
+        /* Download Cards */
+        .download-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.1));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .download-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+        }
+        
+        .store-btn {
             display: flex;
-            flex-direction: column;
-            height: 100%; /* Ensures cards in the same row can be equal height */
+            align-items: center;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .playstore-btn {
+            background: #000;
+            color: white;
+        }
+        
+        .appstore-btn {
+            background: #000;
+            color: white;
+        }
+        
+        .website-btn {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .store-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Upcoming Events */
+        .event-card {
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .event-card:hover {
+            transform: translateX(5px);
+            background: rgba(139, 92, 246, 0.05);
+        }
+        
+        .event-date {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        /* Community Card */
+        .community-card {
+            background: linear-gradient(135deg, rgba(6, 214, 160, 0.15), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(6, 214, 160, 0.2);
+        }
+
+        /* Responsive Improvements */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+            }
+            
+            .fixed-nav {
+                padding: 0.75rem 1rem;
+            }
+            
+            .big-bold {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.75rem;
+            }
+            
+            .floating-btn {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .whatsapp-btn {
+                bottom: 80px;
+            }
+            
+            .ai-assistant-btn {
+                bottom: 140px;
+            }
+            
+            .ai-panel {
+                width: calc(100vw - 40px);
+                right: 20px;
+                bottom: 200px;
+            }
+            
+            .metric-value {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .big-bold {
+                font-size: 1.75rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .floating-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 <body class="flex flex-col items-center p-4 lg:p-8">
 
-    <div class="visualizer-bg" id="visualizer-bg">
-        <div class="vu-meter" id="vu-meter"></div>
-        <div class="floating-element" style="width: 300px; height: 300px; top: 10%; left: 5%; animation-delay: 0s;"></div>
-        <div class="floating-element" style="width: 200px; height: 200px; top: 60%; left: 80%; animation-delay: 2s;"></div>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-content">
+            <div class="preloader-spinner"></div>
+            <div class="preloader-logo">UGONLINEMEDIA</div>
+            <div class="loading-text">Loading your experience...</div>
+        </div>
     </div>
 
-    <header class="w-full max-w-7xl mb-8">
-        <nav class="frosted-glass rounded-full px-6 py-3 flex items-center justify-between">
+    <!-- Particle Background -->
+    <div class="particles-container" id="particles"></div>
+
+    <!-- Visualizer Background -->
+    <div class="visualizer-bg" id="visualizer-bg">
+        <div class="vu-meter" id="vu-meter"></div>
+    </div>
+
+    <!-- Fixed Navigation Bar -->
+    <nav class="fixed-nav" id="fixedNav">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <img src="https://cdn-icons-png.flaticon.com/512/9415/9415424.png" alt="Logo" class="w-10 h-10">
-                <div class="font-extrabold text-xl lg:text-2xl bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400 text-transparent bg-clip-text tracking-wide">
+                <div class="lg:hidden">
+                    <button id="menuToggle" class="text-2xl text-white hover:text-purple-300 transition-colors">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                <img src="https://cdn-icons-png.flaticon.com/512/9415/9415424.png" alt="Logo" class="w-10 h-10 lg:w-12 lg:h-12">
+                <div class="font-black text-xl lg:text-3xl bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400 text-transparent bg-clip-text tracking-tight">
                     UGONLINEMEDIA
                 </div>
             </div>
-            <a href="#" class="block py-2 text-gray-100 bg-gradient-to-r from-purple-600 to-indigo-600 px-4 rounded-full shadow-md hover:from-pink-600 hover:to-purple-700 hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold flex items-center">
-                <i class="fas fa-home mr-2"></i>HOME
+            
+            <!-- Desktop Navigation -->
+            <div class="hidden lg:flex items-center space-x-6">
+                <a href="#home" class="text-white hover:text-purple-300 transition-colors font-semibold text-lg">Home</a>
+                <a href="#team" class="text-white hover:text-purple-300 transition-colors font-semibold text-lg">Team</a>
+                <a href="#events" class="text-white hover:text-purple-300 transition-colors font-semibold text-lg">Events</a>
+                <a href="#community" class="text-white hover:text-purple-300 transition-colors font-semibold text-lg">Community</a>
+                <a href="#download" class="text-white hover:text-purple-300 transition-colors font-semibold text-lg">Download</a>
+                <button id="themeToggle" class="ml-4 px-6 py-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-sm flex items-center hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-moon mr-2"></i> Theme
+                </button>
+            </div>
+            
+            <!-- Live Metrics Mini Display -->
+            <div class="hidden lg:flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-sm font-semibold text-green-400" id="onlineCountMini">0</span>
+                    <span class="text-sm text-gray-400">Online</span>
+                </div>
+                <div class="text-sm font-mono text-gray-300" id="liveTimeMini">00:00</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                <i class="fas fa-play text-white text-sm"></i>
+            </div>
+            <div>
+                <div class="font-bold" id="notification-title">Now Streaming</div>
+                <div class="text-sm opacity-90" id="notification-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offline Indicator -->
+    <div id="offlineIndicator" class="offline-indicator">
+        <div class="flex items-center space-x-3">
+            <i class="fas fa-wifi-slash"></i>
+            <span>You're offline. Playing from local storage.</span>
+        </div>
+    </div>
+
+    <!-- Floating WhatsApp Button -->
+    <button class="floating-btn whatsapp-btn" id="whatsappBtn">
+        <i class="fab fa-whatsapp"></i>
+    </button>
+
+    <!-- Floating AI Assistant -->
+    <button class="floating-btn ai-assistant-btn" id="aiAssistantBtn">
+        <i class="fas fa-robot"></i>
+    </button>
+
+    <!-- AI Assistant Panel -->
+    <div class="ai-panel" id="aiPanel">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-xl">UG Media Assistant</h3>
+            <button id="closeAIPanel" class="text-gray-500 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="ai-messages mb-4 max-h-60 overflow-y-auto">
+            <div class="ai-message bg-purple-500/10 rounded-lg p-3 mb-2">
+                <p class="text-sm">Hello! I'm your UG Media assistant. How can I help you today?</p>
+            </div>
+        </div>
+        <div class="flex space-x-2">
+            <input type="text" id="aiInput" placeholder="Ask me anything..." class="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500">
+            <button id="sendAI" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="flex flex-col space-y-6">
+            <a href="#home" class="text-xl font-bold text-white hover:text-purple-300 transition-colors py-2 border-b border-white/10">
+                <i class="fas fa-home mr-3"></i> Home
             </a>
-        </nav>
+            <a href="#team" class="text-xl font-bold text-white hover:text-purple-300 transition-colors py-2 border-b border-white/10">
+                <i class="fas fa-users mr-3"></i> Our Team
+            </a>
+            <a href="#events" class="text-xl font-bold text-white hover:text-purple-300 transition-colors py-2 border-b border-white/10">
+                <i class="fas fa-calendar-alt mr-3"></i> Events
+            </a>
+            <a href="#community" class="text-xl font-bold text-white hover:text-purple-300 transition-colors py-2 border-b border-white/10">
+                <i class="fas fa-comments mr-3"></i> Community
+            </a>
+            <a href="#download" class="text-xl font-bold text-white hover:text-purple-300 transition-colors py-2 border-b border-white/10">
+                <i class="fas fa-download mr-3"></i> Download App
+            </a>
+            <div class="pt-6 mt-6 border-t border-white/10">
+                <button id="themeToggleMobile" class="w-full py-3 px-6 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold flex items-center justify-center transform hover:scale-105 transition-all">
+                    <i class="fas fa-moon mr-2"></i> Toggle Theme
+                </button>
+            </div>
+        </div>
+    </div>
 
-        <div class="w-full flex justify-center mt-6">
-            <div class="frosted-glass rounded-3xl p-4 w-full max-w-3xl text-center">
-                <h2 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400 mb-3 drop-shadow-lg">
-                    🎙️ UG Online Media Live
-                </h2>
-                <iframe src="https://radio.menu/stations/ugonlinemedia-com-ugonlinemedia/embed/" width="100%" height="97" scrolling="no" frameborder="no" loading="lazy" class="rounded-xl border-none shadow-md"></iframe>
-                <p class="text-sm text-gray-400 mt-2">
-                    Streaming powered by <a href="https://radio.menu/" target="_blank" class="text-purple-400 hover:underline">Radio.Menu</a>
+    <!-- Metrics Dashboard -->
+    <div class="w-full max-w-7xl mb-8 modern-card metrics-card p-6">
+        <h2 class="section-title text-center mb-6">Live Metrics Dashboard</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="text-center">
+                <div class="metric-value" id="onlineNow">0</div>
+                <p class="text-gray-400 font-semibold">Online Now</p>
+            </div>
+            <div class="text-center">
+                <div class="metric-value" id="todayUsers">0</div>
+                <p class="text-gray-400 font-semibold">Today</p>
+            </div>
+            <div class="text-center">
+                <div class="metric-value" id="weekUsers">0</div>
+                <p class="text-gray-400 font-semibold">This Week</p>
+            </div>
+            <div class="text-center">
+                <div class="metric-value" id="liveClock">00:00:00</div>
+                <p class="text-gray-400 font-semibold">Live Time</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Stream Card -->
+    <div class="w-full max-w-7xl flex justify-center mt-8">
+        <div class="modern-card p-6 w-full max-w-3xl text-center relative" id="home">
+            <div class="absolute top-4 right-4">
+                <span class="live-badge flex items-center">
+                    <span class="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+                    LIVE
+                </span>
+            </div>
+            <h2 class="big-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400 mb-4 drop-shadow-lg">
+                🎙️ UG Online Media Live
+            </h2>
+            <div class="relative">
+                <iframe src="https://radio.menu/stations/ugonlinemedia-com-ugonlinemedia/embed/" 
+                        width="100%" 
+                        height="97" 
+                        scrolling="no" 
+                        frameborder="no" 
+                        loading="lazy" 
+                        class="rounded-2xl border-none shadow-lg"
+                        id="radioStream">
+                </iframe>
+                <div id="streamStatus" class="absolute -bottom-6 left-0 right-0 text-sm text-center">
+                    <div class="inline-flex items-center space-x-2 bg-black/50 px-3 py-1 rounded-full">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span>Streaming Live</span>
+                    </div>
+                </div>
+            </div>
+            <p class="text-sm text-gray-400 mt-8">
+                Streaming powered by <a href="https://radio.menu/" target="_blank" class="text-purple-400 hover:underline font-bold">Radio.Menu</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- News Ticker -->
+    <div class="w-full max-w-7xl mx-auto news-ticker mt-8">
+        <div class="news-ticker-content text-sm md:text-base text-gray-200 px-4 font-semibold">
+            <span>🔥 Breaking: UG Online Media reaches 10,000 listeners! • 🎉 New show: Tech Talk Tuesdays • 📱 Download our mobile app for exclusive content • 🌟 Like & share your favorite songs! • 🎶 Now Playing: Top Ugandan Hits • 📻 Tune in 24/7 for the best vibes!</span>
+        </div>
+    </div>
+
+    <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-8 px-4 mt-8">
+
+        <!-- Left Column -->
+        <div class="flex flex-col gap-8">
+            <!-- Modernized Hero Card -->
+            <div class="modern-card p-8 text-center relative overflow-hidden" id="heroCard">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
+                <h1 class="hero-title big-bold mb-4">
+                    Hello Uganda! 🎉
+                </h1>
+                <p class="body-large font-bold text-cyan-200 mb-6">
+                    Welcome to Ugonlinemedia App! 📱🌟
                 </p>
-            </div>
-        </div>
-
-        <div class="w-full max-w-4xl mx-auto news-ticker">
-            <div class="news-ticker-content text-sm md:text-base text-gray-200 px-4">
-                <span>🔥 Breaking: UG Online Media reaches 10,000 listeners! • 🎉 New show: Tech Talk Tuesdays • 📱 Download our mobile app for exclusive content • 🌟 Like & share your favorite songs! • 🎶 Now Playing: Top Ugandan Hits • 📻 Tune in 24/7 for the best vibes!</span>
-            </div>
-        </div>
-    </header>
-<main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-8 px-4">
-
-    <!-- Left Column -->
-    <div class="flex flex-col gap-8">
-        <div class="frosted-glass p-6 rounded-3xl feature-card">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400">
-                Hello Uganda! 🎉
-            </h1>
-            <p class="text-lg md:text-xl font-semibold text-center text-cyan-200 mt-2">
-                Welcome to Ugonlinemedia App! 📱🌟
-            </p>
-            <p class="text-gray-300 leading-relaxed text-center mt-4">
-                Your ultimate source for:
-            </p>
-            <div class="grid grid-cols-2 gap-4 mt-6">
-                <div class="p-3 rounded-xl bg-purple-600/20 border border-purple-500/40 text-center transition-all hover:scale-105 hover:bg-purple-600/40">🎭 Entertainment</div>
-                <div class="p-3 rounded-xl bg-purple-600/20 border border-purple-500/40 text-center transition-all hover:scale-105 hover:bg-purple-600/40">🏛️ Politics</div>
-                <div class="p-3 rounded-xl bg-purple-600/20 border border-purple-500/40 text-center transition-all hover:scale-105 hover:bg-purple-600/40">🔍 Discoveries</div>
-                <div class="p-3 rounded-xl bg-purple-600/20 border border-purple-500/40 text-center transition-all hover:scale-105 hover:bg-purple-600/40">💻 Tech tips</div>
-            </div>
-        </div>
-
-        <!-- NEW: Local + Online Player Card -->
-        <div class="frosted-glass p-6 rounded-3xl feature-card space-y-6">
-            <!-- Local Offline Player -->
-            <div>
-                <h3 class="text-xl font-bold mb-4 flex items-center text-pink-300">
-                    <i class="fas fa-headphones mr-2"></i> Local Playback
-                </h3>
-                <p class="text-sm text-gray-400 mb-4">
-                    No internet? Play music directly from your device.
+                <p class="text-gray-300 body-large mb-8 leading-relaxed font-medium">
+                    Your ultimate digital hub for entertainment, news, and innovation
                 </p>
-
-                <div class="flex items-center space-x-4 mb-4">
-                    <div id="local-album-art" class="w-20 h-20 bg-gray-700/50 rounded-lg flex items-center justify-center text-3xl text-pink-400 shadow-xl flex-shrink-0">
-                        <i class="fas fa-music"></i>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="group p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 text-center transition-all duration-300 hover:scale-105 hover:bg-purple-500/20 hover:border-purple-500/40 cursor-pointer">
+                        <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🎭</div>
+                        <div class="font-bold text-white">Entertainment</div>
                     </div>
-                    <div class="min-w-0">
-                        <div class="text-lg font-semibold text-white truncate" id="local-song-title">Please load a song...</div>
-                        <div class="text-gray-400 truncate" id="local-artist-name">Local Device Storage</div>
+                    <div class="group p-4 rounded-2xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 text-center transition-all duration-300 hover:scale-105 hover:bg-blue-500/20 hover:border-blue-500/40 cursor-pointer">
+                        <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🏛️</div>
+                        <div class="font-bold text-white">Politics</div>
+                    </div>
+                    <div class="group p-4 rounded-2xl bg-gradient-to-br from-green-500/10 to-teal-500/10 border border-green-500/20 text-center transition-all duration-300 hover:scale-105 hover:bg-green-500/20 hover:border-green-500/40 cursor-pointer">
+                        <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🔍</div>
+                        <div class="font-bold text-white">Discoveries</div>
+                    </div>
+                    <div class="group p-4 rounded-2xl bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/20 text-center transition-all duration-300 hover:scale-105 hover:bg-orange-500/20 hover:border-orange-500/40 cursor-pointer">
+                        <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">💻</div>
+                        <div class="font-bold text-white">Tech Tips</div>
                     </div>
                 </div>
-
-                <label for="local-file-input" class="cursor-pointer block mb-4">
-                    <div class="text-center py-3 px-6 rounded-full font-bold text-white bg-gradient-to-r from-pink-500 to-purple-600 shadow-lg hover:from-pink-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center">
-                        <i class="fas fa-cloud-upload-alt mr-2"></i> Load Music from Device
-                    </div>
-                    <input type="file" id="local-file-input" accept="audio/*" multiple class="hidden">
-                </label>
-
-                <div class="flex items-center space-x-3 mb-4">
-                    <span id="current-time" class="text-xs text-gray-400">0:00</span>
-                    <input type="range" id="seek-slider" value="0" max="100" class="flex-grow rounded-full">
-                    <span id="duration" class="text-xs text-gray-400">0:00</span>
-                </div>
-
-                <div class="flex justify-center items-center space-x-6">
-                    <button id="prev-btn" class="text-gray-400 hover:text-pink-400 transition-colors duration-200 disabled:opacity-50" disabled>
-                        <i class="fas fa-backward text-2xl"></i>
-                    </button>
-                    <button id="play-pause-btn" class="w-16 h-16 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50" disabled>
-                        <i class="fas fa-play text-2xl" id="play-icon"></i>
-                    </button>
-                    <button id="next-btn" class="text-gray-400 hover:text-pink-400 transition-colors duration-200 disabled:opacity-50" disabled>
-                        <i class="fas fa-forward text-2xl"></i>
-                    </button>
+                <div class="mt-8 pt-8 border-t border-white/10">
+                    <p class="text-sm text-gray-400 font-medium">
+                        Join 10,000+ listeners who trust us for daily updates and premium entertainment
+                    </p>
                 </div>
             </div>
 
-            <hr class="border-gray-600/50">
+            <!-- Enhanced Player Card -->
+            <div class="modern-card p-6 space-y-6" id="player">
+                <!-- Local Offline Player -->
+                <div>
+                    <h3 class="card-title mb-4 flex items-center text-pink-300">
+                        <i class="fas fa-headphones mr-2"></i> Local Music Player
+                        <span class="ml-auto text-xs font-bold bg-white/10 px-3 py-1 rounded-full" id="storageStatus">
+                            <i class="fas fa-database mr-1"></i>
+                            <span id="storageUsage">0/10</span> songs
+                        </span>
+                    </h3>
+                    <p class="text-sm text-gray-400 mb-6 font-medium">
+                        Load music from your device or use previously saved tracks
+                    </p>
 
-            <!-- Online Radio Player -->
-            <div>
-                <h3 class="text-xl font-bold mb-4 flex items-center text-purple-300">
-                    <i class="fas fa-play-circle mr-2"></i> Now Playing (Radio)
+                    <!-- Now Playing -->
+                    <div class="flex items-center space-x-4 mb-6 p-4 rounded-2xl bg-white/5">
+                        <div id="local-album-art" class="w-20 h-20 rounded-xl flex items-center justify-center text-3xl text-pink-400 bg-gradient-to-br from-pink-500/20 to-purple-500/20 shadow-xl flex-shrink-0 overflow-hidden">
+                            <i class="fas fa-music" id="albumArtIcon"></i>
+                            <img id="albumArtImage" src="" alt="" class="hidden w-full h-full object-cover">
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-lg font-bold text-white truncate" id="local-song-title">No song loaded</div>
+                            <div class="text-gray-400 truncate font-medium" id="local-artist-name">Select a track to begin</div>
+                            <div class="flex items-center mt-2 space-x-4">
+                                <button id="repeatBtn" class="text-gray-500 hover:text-purple-400 transition-colors" title="Repeat">
+                                    <i class="fas fa-redo text-sm"></i>
+                                </button>
+                                <button id="shuffleBtn" class="text-gray-500 hover:text-purple-400 transition-colors" title="Shuffle">
+                                    <i class="fas fa-random text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- File Input -->
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <label for="local-file-input" class="cursor-pointer">
+                            <div class="text-center py-3 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center">
+                                <i class="fas fa-cloud-upload-alt mr-2"></i> Add Music
+                            </div>
+                            <input type="file" id="local-file-input" accept="audio/*" multiple class="hidden">
+                        </label>
+                        <button id="clearStorageBtn" class="py-3 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-gray-700 to-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center">
+                            <i class="fas fa-trash mr-2"></i> Clear All
+                        </button>
+                    </div>
+
+                    <!-- Playlist -->
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-bold text-gray-300">Playlist</h4>
+                            <span class="text-xs text-gray-500 font-bold" id="playlistCount">0 tracks</span>
+                        </div>
+                        <div id="playlist-container" class="max-h-40 overflow-y-auto space-y-2 pr-2">
+                            <div class="text-center py-4 text-gray-500">
+                                <i class="fas fa-music mb-2"></i>
+                                <p class="text-sm font-medium">No tracks in playlist</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center justify-between text-xs text-gray-400 font-medium">
+                            <span id="current-time">0:00</span>
+                            <span id="duration">0:00</span>
+                        </div>
+                        <input type="range" id="seek-slider" value="0" max="100" class="progress-bar">
+                    </div>
+
+                    <!-- Player Controls -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button id="prev-btn" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/20 transition-all disabled:opacity-50" disabled title="Previous">
+                                <i class="fas fa-step-backward"></i>
+                            </button>
+                            <button id="play-pause-btn" class="w-14 h-14 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 flex items-center justify-center" disabled>
+                                <i class="fas fa-play text-xl" id="play-icon"></i>
+                            </button>
+                            <button id="next-btn" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/20 transition-all disabled:opacity-50" disabled title="Next">
+                                <i class="fas fa-step-forward"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Volume Control -->
+                        <div class="flex items-center space-x-3 w-32">
+                            <i class="fas fa-volume-down text-gray-400"></i>
+                            <input type="range" id="volume-slider" min="0" max="100" value="70" class="volume-slider">
+                            <i class="fas fa-volume-up text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <audio id="local-audio-player"></audio>
+            </div>
+
+            <!-- Podcasts Section -->
+            <div class="modern-card p-6" id="podcasts">
+                <h3 class="section-title flex items-center text-purple-300">
+                    <i class="fas fa-podcast mr-3"></i> Featured Podcasts
+                    <span class="ml-auto text-sm font-bold bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full">
+                        <i class="fas fa-headphones mr-1"></i> Listen Now
+                    </span>
                 </h3>
-                <div class="flex items-center space-x-4">
-                    <div class="w-16 h-16 bg-purple-500/20 rounded-xl flex items-center justify-center text-2xl text-purple-300 shadow-inner flex-shrink-0">
-                        <i class="fas fa-music"></i>
+                <p class="text-gray-400 mb-6 font-medium">Catch up on our latest episodes and discussions</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Podcast 1 -->
+                    <div class="media-card modern-card p-4 relative group">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+                                <i class="fas fa-microphone text-white text-2xl"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="card-title text-white mb-1 truncate">Tech Talk Tuesday</h4>
+                                <p class="text-sm text-gray-400 mb-2 font-medium">Latest tech trends in Uganda</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs text-purple-300 font-bold">Episode 45</span>
+                                    <button class="podcast-play-btn" data-url="https://example.com/podcast1.mp3" data-title="Tech Talk Tuesday" data-artist="DJ Mark">
+                                        <i class="fas fa-play-circle text-xl text-purple-400 hover:text-purple-300 transition-colors"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="min-w-0">
-                        <div class="text-lg font-semibold text-white truncate" id="current-song-radio">Loading...</div>
-                        <div class="text-gray-400 truncate" id="current-artist-radio">UG Online Media</div>
+                    
+                    <!-- Podcast 2 -->
+                    <div class="media-card modern-card p-4 relative group">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+                                <i class="fas fa-newspaper text-white text-2xl"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="card-title text-white mb-1 truncate">Morning News Digest</h4>
+                                <p class="text-sm text-gray-400 mb-2 font-medium">Daily news roundup</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs text-blue-300 font-bold">Daily</span>
+                                    <button class="podcast-play-btn" data-url="https://example.com/podcast2.mp3" data-title="Morning News Digest" data-artist="Sarah K.">
+                                        <i class="fas fa-play-circle text-xl text-blue-400 hover:text-blue-300 transition-colors"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+                
+                <div class="mt-6 text-center">
+                    <a href="#" class="inline-flex items-center text-purple-300 hover:text-purple-200 font-bold">
+                        View All Podcasts <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
                 </div>
             </div>
 
-            <audio id="local-audio-player" src=""></audio>
-        </div>
-
-        <div class="frosted-glass p-6 rounded-3xl feature-card">
-            <h3 class="text-xl font-bold mb-2 flex items-center text-purple-300">
-                <i class="fas fa-info-circle mr-2"></i> About Us
-            </h3>
-            <p class="text-gray-300 leading-relaxed text-sm">
-                UgOnline Radio is your one-stop destination for the latest news, hottest entertainment buzz, insightful political analysis, and tech discoveries. We bring Uganda to the world and the world to Uganda, 24/7.
-            </p>
-        </div>
-    </div>
-
-    <!-- Right Column -->
-    <div class="flex flex-col gap-8">
-        <!-- Recently Played -->
-        <div class="frosted-glass p-6 rounded-3xl feature-card">
-            <h3 class="text-xl font-bold mb-4 flex items-center text-purple-300">
-                <i class="fas fa-history mr-2"></i> Recently Played
-            </h3>
-            <div id="recent-tracks" class="space-y-3 max-h-60 overflow-y-auto pr-2">
-                <div class="flex items-center space-x-3 p-2 rounded-lg bg-white/5">
-                     <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-300 flex-shrink-0"><i class="fas fa-music text-sm"></i></div>
-                    <div class="min-w-0">
-                        <div class="font-semibold text-sm truncate">Loading tracks...</div>
-                        <div class="text-xs text-gray-400 truncate">Please wait</div>
+            <!-- Meet Our Team Section -->
+            <div class="modern-card p-6" id="team">
+                <h3 class="section-title flex items-center text-purple-300">
+                    <i class="fas fa-users mr-3"></i> Meet Our Team
+                    <span class="ml-auto text-sm font-bold bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full">
+                        <i class="fas fa-broadcast-tower mr-1"></i> Presenters
+                    </span>
+                </h3>
+                <p class="text-gray-400 mb-6 font-medium">Get to know the faces behind UG Online Media</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Team Member 1 -->
+                    <div class="team-card modern-card p-6 text-center">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="DJ Mark" class="team-image mx-auto">
+                        <h4 class="card-title text-white">DJ Mark</h4>
+                        <p class="text-purple-300 font-bold mb-2">Lead Presenter</p>
+                        <p class="text-gray-400 text-sm font-medium">Morning Show Host with 5+ years experience in radio broadcasting</p>
+                        <div class="mt-4 flex justify-center space-x-3">
+                            <a href="#" class="text-blue-400 hover:text-blue-300"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="text-pink-400 hover:text-pink-300"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="text-red-400 hover:text-red-300"><i class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Member 2 -->
+                    <div class="team-card modern-card p-6 text-center">
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Sarah K." class="team-image mx-auto">
+                        <h4 class="card-title text-white">Sarah K.</h4>
+                        <p class="text-purple-300 font-bold mb-2">News Anchor</p>
+                        <p class="text-gray-400 text-sm font-medium">Bringing you the latest news updates every hour</p>
+                        <div class="mt-4 flex justify-center space-x-3">
+                            <a href="#" class="text-blue-400 hover:text-blue-300"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="text-pink-400 hover:text-pink-300"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="text-red-400 hover:text-red-300"><i class="fab fa-youtube"></i></a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Today's Schedule -->
-        <div class="frosted-glass p-6 rounded-3xl feature-card">
-            <h3 class="text-xl font-bold mb-4 flex items-center text-purple-300">
-                <i class="fas fa-calendar-alt mr-2"></i> Today's Schedule
-            </h3>
-            <div id="schedule-list" class="space-y-3">
-                <div class="p-3 border-l-4 border-purple-500 bg-white/5 rounded-r-lg">
-                    <div class="font-bold text-purple-400">06:00 - 09:00</div>
-                    <div>Morning Show with DJ Mark</div>
-                </div>
-                <div class="p-3 border-l-4 border-purple-500 bg-white/5 rounded-r-lg">
-                    <div class="font-bold text-purple-400">09:00 - 12:00</div>
-                    <div>Top 40 Countdown</div>
-                </div>
-                <div class="p-3 border-l-4 border-purple-500 bg-white/5 rounded-r-lg">
-                    <div class="font-bold text-purple-400">12:00 - 14:00</div>
-                    <div>News Hour</div>
-                </div>
-                <div class="p-3 border-l-4 border-purple-500 bg-white/5 rounded-r-lg">
-                    <div class="font-bold text-purple-400">14:00 - 17:00</div>
-                    <div>Afternoon Drive</div>
+                
+                <div class="mt-6 text-center">
+                    <a href="#" class="inline-flex items-center bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full font-bold transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-users mr-2"></i> View All Team Members
+                    </a>
                 </div>
             </div>
         </div>
+
+        <!-- Right Column -->
+        <div class="flex flex-col gap-8">
+            <!-- YouTube Videos Grid -->
+            <div class="modern-card p-6" id="videos">
+                <h3 class="section-title flex items-center text-purple-300">
+                    <i class="fab fa-youtube mr-3"></i> Latest Videos
+                    <span class="ml-auto text-sm font-bold bg-red-500/20 text-red-300 px-3 py-1 rounded-full">
+                        <i class="fab fa-youtube mr-1"></i> Subscribe
+                    </span>
+                </h3>
+                <p class="text-gray-400 mb-6 font-medium">Watch our latest content on YouTube</p>
+                
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Video 1 -->
+                    <div class="media-card modern-card overflow-hidden">
+                        <div class="aspect-video bg-gradient-to-br from-red-500/20 to-red-900/20 relative overflow-hidden">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fab fa-youtube text-6xl text-red-500 opacity-30"></i>
+                            </div>
+                            <div class="absolute bottom-4 right-4">
+                                <span class="bg-black/70 text-white px-2 py-1 rounded text-xs font-bold">12:45</span>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <button class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center hover:bg-red-700 transition-colors transform hover:scale-110">
+                                    <i class="fas fa-play text-white text-2xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="card-title text-white mb-2">Live Concert Highlights</h4>
+                            <p class="text-sm text-gray-400 mb-3 font-medium">Watch highlights from our latest live concert event featuring top Ugandan artists</p>
+                            <div class="flex items-center justify-between text-xs text-gray-500 font-bold">
+                                <span>2 days ago • 5.2K views</span>
+                                <span class="flex items-center">
+                                    <i class="fas fa-thumbs-up mr-1"></i> 342
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video 2 -->
+                    <div class="media-card modern-card overflow-hidden">
+                        <div class="aspect-video bg-gradient-to-br from-blue-500/20 to-blue-900/20 relative overflow-hidden">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fab fa-youtube text-6xl text-blue-500 opacity-30"></i>
+                            </div>
+                            <div class="absolute bottom-4 right-4">
+                                <span class="bg-black/70 text-white px-2 py-1 rounded text-xs font-bold">8:22</span>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <button class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center hover:bg-red-700 transition-colors transform hover:scale-110">
+                                    <i class="fas fa-play text-white text-2xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="card-title text-white mb-2">Behind the Scenes: Radio Show</h4>
+                            <p class="text-sm text-gray-400 mb-3 font-medium">Exclusive look at how our morning show is produced</p>
+                            <div class="flex items-center justify-between text-xs text-gray-500 font-bold">
+                                <span>1 week ago • 3.1K views</span>
+                                <span class="flex items-center">
+                                    <i class="fas fa-thumbs-up mr-1"></i> 189
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 text-center">
+                    <a href="#" target="_blank" class="inline-flex items-center bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-bold transition-all duration-300 transform hover:scale-105">
+                        <i class="fab fa-youtube mr-2"></i> Visit Our YouTube Channel
+                    </a>
+                </div>
+            </div>
+
+            <!-- Recently Played with Live Data -->
+            <div class="modern-card p-6">
+                <h3 class="section-title flex items-center text-purple-300">
+                    <i class="fas fa-history mr-3"></i> Recently Played
+                    <div class="ml-auto w-3 h-3 bg-green-500 rounded-full animate-pulse" id="liveIndicator"></div>
+                </h3>
+                <div id="recent-tracks" class="space-y-3 max-h-72 overflow-y-auto pr-2">
+                    <div class="text-center py-8 text-gray-500">
+                        <div class="loading-spinner w-8 h-8 mx-auto mb-3"></div>
+                        <p class="font-medium">Loading recent tracks...</p>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <button id="refreshRecentBtn" class="text-sm text-purple-300 hover:text-purple-200 font-bold">
+                        <i class="fas fa-sync-alt mr-1"></i> Refresh List
+                    </button>
+                </div>
+            </div>
+
+            <!-- Today's Schedule with Live Indicator -->
+            <div class="modern-card p-6" id="schedule">
+                <h3 class="section-title flex items-center text-purple-300">
+                    <i class="fas fa-calendar-alt mr-3"></i> Today's Schedule
+                    <span class="ml-auto text-sm font-bold bg-green-500/20 text-green-300 px-3 py-1 rounded-full" id="currentTimeDisplay">
+                        Loading...
+                    </span>
+                </h3>
+                <div id="schedule-list" class="space-y-3">
+                    <!-- Schedule will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Upcoming Events Section -->
+            <div class="modern-card p-6" id="events">
+                <h3 class="section-title flex items-center text-purple-300">
+                    <i class="fas fa-calendar-star mr-3"></i> Upcoming Events
+                    <span class="ml-auto text-sm font-bold bg-orange-500/20 text-orange-300 px-3 py-1 rounded-full">
+                        <i class="fas fa-bullhorn mr-1"></i> Don't Miss
+                    </span>
+                </h3>
+                <p class="text-gray-400 mb-6 font-medium">Mark your calendar for these exciting events</p>
+                
+                <div class="space-y-4">
+                    <!-- Event 1 -->
+                    <div class="event-card modern-card p-4">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="event-date">Dec 25, 2023</div>
+                                <h4 class="card-title text-white">Christmas Live Concert</h4>
+                                <p class="text-sm text-gray-400 font-medium">Featuring top Ugandan artists at Kampala Serena Hotel</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-bold bg-purple-500/20 text-purple-300 px-2 py-1 rounded">7:00 PM</span>
+                                <div class="mt-2">
+                                    <button class="text-xs font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-1 rounded-lg">RSVP</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Event 2 -->
+                    <div class="event-card modern-card p-4">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="event-date">Jan 1, 2024</div>
+                                <h4 class="card-title text-white">New Year Countdown Show</h4>
+                                <p class="text-sm text-gray-400 font-medium">Live broadcast from the UG Online Media studio</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-bold bg-purple-500/20 text-purple-300 px-2 py-1 rounded">10:00 PM</span>
+                                <div class="mt-2">
+                                    <button class="text-xs font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-1 rounded-lg">Remind Me</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Event 3 -->
+                    <div class="event-card modern-card p-4">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="event-date">Jan 15, 2024</div>
+                                <h4 class="card-title text-white">UG Media Awards Night</h4>
+                                <p class="text-sm text-gray-400 font-medium">Celebrating the best in Ugandan media and entertainment</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-bold bg-purple-500/20 text-purple-300 px-2 py-1 rounded">6:30 PM</span>
+                                <div class="mt-2">
+                                    <button class="text-xs font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-1 rounded-lg">Get Tickets</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 text-center">
+                    <a href="#" class="inline-flex items-center text-purple-300 hover:text-purple-200 font-bold">
+                        View All Events <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Join Our Community Discussions -->
+            <div class="modern-card p-6 community-card" id="community">
+                <h3 class="section-title flex items-center text-green-300">
+                    <i class="fas fa-comments mr-3"></i> Join Our Community
+                    <span class="ml-auto text-sm font-bold bg-green-500/20 text-green-300 px-3 py-1 rounded-full">
+                        <i class="fas fa-users mr-1"></i> Active
+                    </span>
+                </h3>
+                <p class="text-gray-400 mb-6 font-medium">
+                    Connect with fellow Ugonlinemedia listeners, share your thoughts, and be part of Uganda's most vibrant online radio community
+                </p>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center">
+                            <i class="fas fa-comment-alt text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="card-title text-white">Live Discussions</h4>
+                            <p class="text-sm text-gray-400 font-medium">Real-time chats during shows</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                            <i class="fas fa-poll text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="card-title text-white">Polls & Surveys</h4>
+                            <p class="text-sm text-gray-400 font-medium">Voice your opinion on topics</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
+                            <i class="fas fa-star text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="card-title text-white">Fan Requests</h4>
+                            <p class="text-sm text-gray-400 font-medium">Request songs and suggest content</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 grid grid-cols-2 gap-3">
+                    <a href="#" class="store-btn bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700">
+                        <i class="fab fa-whatsapp mr-2"></i> WhatsApp Group
+                    </a>
+                    <a href="#" class="store-btn bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700">
+                        <i class="fab fa-telegram mr-2"></i> Telegram
+                    </a>
+                </div>
+            </div>
+
+            <!-- Shows Filter Section -->
+            <div class="modern-card p-6" id="shows">
+                <h3 class="section-title flex items-center text-purple-300">
+                    <i class="fas fa-filter mr-3"></i> Browse Shows
+                    <span class="ml-auto text-sm font-bold bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full">
+                        <i class="fas fa-sliders-h mr-1"></i> Filter
+                    </span>
+                </h3>
+                
+                <!-- Filter Buttons -->
+                <div class="shows-filter mb-6 flex flex-wrap gap-2">
+                    <button class="filter-btn active px-4 py-2 rounded-full text-sm font-bold transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md" data-filter="*">All Shows</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm font-bold transition-all bg-white/10 hover:bg-white/20" data-filter=".music">Music</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm font-bold transition-all bg-white/10 hover:bg-white/20" data-filter=".talk">Talk</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm font-bold transition-all bg-white/10 hover:bg-white/20" data-filter=".news">News</button>
+                </div>
+                
+                <!-- Shows Grid -->
+                <div class="shows-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Shows will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Download App Cards Section -->
+    <div class="w-full max-w-7xl mt-12 px-4" id="download">
+        <h2 class="section-title text-center mb-8">Download Our App</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Google Play Store -->
+            <div class="download-card modern-card p-8 text-center">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center">
+                    <i class="fab fa-google-play text-white text-3xl"></i>
+                </div>
+                <h3 class="card-title text-white mb-2">Google Play Store</h3>
+                <p class="text-gray-400 mb-6 font-medium">Get the app on Android devices</p>
+                <a href="#" class="store-btn playstore-btn mx-auto">
+                    <i class="fab fa-google-play mr-2"></i> Download Now
+                </a>
+                <div class="mt-4 text-sm text-gray-400">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star-half-alt text-yellow-400"></i>
+                    <span class="ml-2 font-bold">4.8 (2.5K+ downloads)</span>
+                </div>
+            </div>
+            
+            <!-- Apple App Store -->
+            <div class="download-card modern-card p-8 text-center">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-gray-800 to-black flex items-center justify-center">
+                    <i class="fab fa-apple text-white text-3xl"></i>
+                </div>
+                <h3 class="card-title text-white mb-2">Apple App Store</h3>
+                <p class="text-gray-400 mb-6 font-medium">Available on iOS and iPadOS</p>
+                <a href="#" class="store-btn appstore-btn mx-auto">
+                    <i class="fab fa-apple mr-2"></i> Download Now
+                </a>
+                <div class="mt-4 text-sm text-gray-400">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <span class="ml-2 font-bold">5.0 (1.8K+ downloads)</span>
+                </div>
+            </div>
+            
+            <!-- Official Website -->
+            <div class="download-card modern-card p-8 text-center">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                    <i class="fas fa-globe text-white text-3xl"></i>
+                </div>
+                <h3 class="card-title text-white mb-2">Official Website</h3>
+                <p class="text-gray-400 mb-6 font-medium">Direct download from our website</p>
+                <a href="#" class="store-btn website-btn mx-auto">
+                    <i class="fas fa-download mr-2"></i> Download Direct
+                </a>
+                <div class="mt-4">
+                    <div class="text-sm text-gray-400 font-bold">
+                        <i class="fas fa-shield-alt text-green-400 mr-1"></i>
+                        Verified & Secure
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">Latest version 2.4.1</div>
+                </div>
+            </div>
+        </div>
     </div>
 
-</main>
+    <footer class="w-full mt-12 px-4">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
 
-<footer class="w-full mt-12 px-4">
-  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- About Card -->
+        <div class="modern-card p-6">
+          <h4 class="card-title bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400">About UG Online Media</h4>
+          <p class="text-gray-300 text-sm leading-relaxed mb-4 font-medium">
+            Bringing Uganda to the world and the world to Uganda, 24/7. Catch the latest news, entertainment, tech updates, and more.
+          </p>
+          <div class="flex items-center space-x-4 mt-4">
+            <div class="flex items-center space-x-2">
+              <i class="fas fa-users text-purple-400"></i>
+              <span class="text-sm text-gray-400 font-bold">10,000+ Listeners</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <i class="fas fa-clock text-purple-400"></i>
+              <span class="text-sm text-gray-400 font-bold">24/7 Streaming</span>
+            </div>
+          </div>
+        </div>
 
-    <!-- About Card -->
-    <div class="frosted-glass p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300">
-      <h4 class="text-xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400">About UG Online Media</h4>
-      <p class="text-gray-300 text-sm leading-relaxed">
-        Bringing Uganda to the world and the world to Uganda, 24/7. Catch the latest news, entertainment, tech updates, and more.
-      </p>
-    </div>
+        <!-- Quick Links Card -->
+        <div class="modern-card p-6">
+          <h4 class="card-title bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400">Quick Links</h4>
+          <ul class="space-y-3 text-sm text-gray-200">
+            <li><a href="#home" class="hover:text-pink-400 transition-colors duration-200 flex items-center font-bold"><i class="fas fa-chevron-right text-xs mr-2"></i> Home</a></li>
+            <li><a href="#team" class="hover:text-pink-400 transition-colors duration-200 flex items-center font-bold"><i class="fas fa-chevron-right text-xs mr-2"></i> Our Team</a></li>
+            <li><a href="#events" class="hover:text-pink-400 transition-colors duration-200 flex items-center font-bold"><i class="fas fa-chevron-right text-xs mr-2"></i> Upcoming Events</a></li>
+            <li><a href="#community" class="hover:text-pink-400 transition-colors duration-200 flex items-center font-bold"><i class="fas fa-chevron-right text-xs mr-2"></i> Community</a></li>
+            <li><a href="#download" class="hover:text-pink-400 transition-colors duration-200 flex items-center font-bold"><i class="fas fa-chevron-right text-xs mr-2"></i> Download App</a></li>
+          </ul>
+        </div>
 
-    <!-- Quick Links Card -->
-    <div class="frosted-glass p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300">
-      <h4 class="text-xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400">Quick Links</h4>
-      <ul class="space-y-2 text-sm text-gray-200">
-        <li><a href="#" class="hover:text-pink-400 transition-colors duration-200">Home</a></li>
-        <li><a href="#" class="hover:text-pink-400 transition-colors duration-200">Live Radio</a></li>
-        <li><a href="#" class="hover:text-pink-400 transition-colors duration-200">Shows & Schedule</a></li>
-        <li><a href="#" class="hover:text-pink-400 transition-colors duration-200">About Us</a></li>
-        <li><a href="#" class="hover:text-pink-400 transition-colors duration-200">Contact</a></li>
-      </ul>
-    </div>
+        <!-- Social + Newsletter Card -->
+        <div class="modern-card p-6">
+          <h4 class="card-title bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400">Stay Connected</h4>
+          
+          <!-- Social Icons -->
+          <div class="flex space-x-4 mb-6">
+            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-purple-600 hover:text-white transition-all duration-300 transform hover:scale-110">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-blue-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-pink-600 hover:text-white transition-all duration-300 transform hover:scale-110">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all duration-300 transform hover:scale-110">
+              <i class="fab fa-youtube"></i>
+            </a>
+          </div>
 
-    <!-- Social + Newsletter Card -->
-    <div class="frosted-glass p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300">
-      <h4 class="text-xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400">Stay Connected</h4>
-      
-      <!-- Social Icons -->
-      <div class="flex space-x-4 mb-4">
-        <a href="#" class="hover:text-pink-400 text-2xl transition-colors duration-200"><i class="fab fa-facebook"></i></a>
-        <a href="#" class="hover:text-pink-400 text-2xl transition-colors duration-200"><i class="fab fa-twitter"></i></a>
-        <a href="#" class="hover:text-pink-400 text-2xl transition-colors duration-200"><i class="fab fa-instagram"></i></a>
-        <a href="#" class="hover:text-pink-400 text-2xl transition-colors duration-200"><i class="fab fa-youtube"></i></a>
+          <!-- Enhanced AJAX Newsletter Form -->
+          <form id="newsletterForm" class="space-y-3">
+            <div>
+              <input type="email" id="subscriberEmail" placeholder="Your email address" required 
+                     class="w-full px-4 py-3 rounded-xl bg-white/10 placeholder-gray-400 text-white focus:bg-white/20 focus:outline-none transition duration-200 font-medium">
+            </div>
+            <button type="submit" id="submitBtn" 
+                    class="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center">
+                <span id="btnText">Subscribe to Updates</span>
+                <i id="btnLoading" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+            </button>
+          </form>
+          <p id="formMessage" class="mt-3 text-sm text-center font-medium"></p>
+        </div>
       </div>
 
-      <!-- Newsletter Form -->
-      <form class="flex flex-col sm:flex-row gap-2">
-        <input type="email" placeholder="Your email" class="flex-grow px-3 py-2 rounded-full bg-white/10 placeholder-gray-300 text-white focus:bg-white/20 focus:outline-none transition duration-200">
-        <button type="submit" class="px-6 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300">Subscribe</button>
-      </form>
-    </div>
-  </div>
+      <!-- Bottom Footer Note -->
+      <div class="mt-12 text-center">
+        <div class="inline-flex flex-wrap items-center justify-center gap-4 text-gray-400 text-sm font-bold">
+          <span>&copy; 2023 UG Online Media. All rights reserved.</span>
+          <span class="hidden md:inline">•</span>
+          <a href="#" class="hover:text-purple-300 transition-colors">Privacy Policy</a>
+          <span>•</span>
+          <a href="#" class="hover:text-purple-300 transition-colors">Terms of Service</a>
+          <span>•</span>
+          <a href="#" class="hover:text-purple-300 transition-colors">Contact Us</a>
+        </div>
+        <div class="mt-4 text-xs text-gray-500 font-medium">
+          <p>Streaming live from Kampala, Uganda 🌍</p>
+        </div>
+      </div>
+    </footer>
 
-  <!-- Bottom Footer Note -->
-  <div class="mt-8 text-center text-gray-400 text-xs">
-    &copy; 2025 UG Online Media. All rights reserved.
-  </div>
-</footer>
-
-
-
-
-
-
-
-
+<!-- Comprehensive JavaScript Implementation -->
 <script>
+    // ======================
+    // GLOBAL STATE MANAGEMENT
+    // ======================
+    const state = {
+        theme: 'dark',
+        playlist: [],
+        currentTrackIndex: 0,
+        isPlaying: false,
+        isShuffle: false,
+        isRepeat: false,
+        volume: 0.7,
+        online: navigator.onLine,
+        schedule: [],
+        recentTracks: [],
+        onlineUsers: 0,
+        todayUsers: 0,
+        weekUsers: 0,
+        lastScroll: 0,
+        isNavHidden: false
+    };
+
+    // ======================
+    // DOM ELEMENTS
+    // ======================
+    const elements = {
+        audioPlayer: document.getElementById('local-audio-player'),
+        fileInput: document.getElementById('local-file-input'),
+        playPauseBtn: document.getElementById('play-pause-btn'),
+        playIcon: document.getElementById('play-icon'),
+        prevBtn: document.getElementById('prev-btn'),
+        nextBtn: document.getElementById('next-btn'),
+        seekSlider: document.getElementById('seek-slider'),
+        currentTimeEl: document.getElementById('current-time'),
+        durationEl: document.getElementById('duration'),
+        songTitleEl: document.getElementById('local-song-title'),
+        artistEl: document.getElementById('local-artist-name'),
+        volumeSlider: document.getElementById('volume-slider'),
+        playlistContainer: document.getElementById('playlist-container'),
+        storageStatus: document.getElementById('storageStatus'),
+        storageUsage: document.getElementById('storageUsage'),
+        playlistCount: document.getElementById('playlistCount'),
+        repeatBtn: document.getElementById('repeatBtn'),
+        shuffleBtn: document.getElementById('shuffleBtn'),
+        clearStorageBtn: document.getElementById('clearStorageBtn'),
+        themeToggle: document.getElementById('themeToggle'),
+        themeToggleMobile: document.getElementById('themeToggleMobile'),
+        notification: document.getElementById('notification'),
+        notificationTitle: document.getElementById('notification-title'),
+        notificationMessage: document.getElementById('notification-message'),
+        offlineIndicator: document.getElementById('offlineIndicator'),
+        menuToggle: document.getElementById('menuToggle'),
+        mobileMenu: document.getElementById('mobileMenu'),
+        streamStatus: document.getElementById('streamStatus'),
+        currentTimeDisplay: document.getElementById('currentTimeDisplay'),
+        scheduleList: document.getElementById('schedule-list'),
+        recentTracksContainer: document.getElementById('recent-tracks'),
+        refreshRecentBtn: document.getElementById('refreshRecentBtn'),
+        albumArtImage: document.getElementById('albumArtImage'),
+        albumArtIcon: document.getElementById('albumArtIcon'),
+        preloader: document.getElementById('preloader'),
+        fixedNav: document.getElementById('fixedNav'),
+        whatsappBtn: document.getElementById('whatsappBtn'),
+        aiAssistantBtn: document.getElementById('aiAssistantBtn'),
+        aiPanel: document.getElementById('aiPanel'),
+        closeAIPanel: document.getElementById('closeAIPanel'),
+        aiInput: document.getElementById('aiInput'),
+        sendAI: document.getElementById('sendAI'),
+        onlineNow: document.getElementById('onlineNow'),
+        todayUsers: document.getElementById('todayUsers'),
+        weekUsers: document.getElementById('weekUsers'),
+        liveClock: document.getElementById('liveClock'),
+        onlineCountMini: document.getElementById('onlineCountMini'),
+        liveTimeMini: document.getElementById('liveTimeMini')
+    };
+
+    // ======================
+    // INITIALIZATION
+    // ======================
     document.addEventListener('DOMContentLoaded', function () {
-        const audioPlayer = document.getElementById('local-audio-player');
-        const fileInput = document.getElementById('local-file-input');
-        const playPauseBtn = document.getElementById('play-pause-btn');
-        const playIcon = document.getElementById('play-icon');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const seekSlider = document.getElementById('seek-slider');
-        const currentTimeEl = document.getElementById('current-time');
-        const durationEl = document.getElementById('duration');
-        const songTitleEl = document.getElementById('local-song-title');
-        const artistEl = document.getElementById('local-artist-name');
+        // Show preloader
+        setTimeout(() => {
+            elements.preloader.style.opacity = '0';
+            elements.preloader.style.visibility = 'hidden';
+            initializeApp();
+        }, 1500);
+    });
 
-        let playlist = [];
-        let currentIndex = 0;
+    function initializeApp() {
+        setupEventListeners();
+        loadFromLocalStorage();
+        setupBackgroundParticles();
+        initializeSchedule();
+        updateOnlineStatus();
+        setupServiceWorker();
+        updateLiveMetrics();
+        updateLiveClock();
+        setupBackgroundPlayback();
+        
+        // Set initial volume
+        elements.audioPlayer.volume = state.volume;
+        elements.volumeSlider.value = state.volume * 100;
+        
+        // Update current time display
+        updateCurrentTimeDisplay();
+        setInterval(updateCurrentTimeDisplay, 60000);
+        
+        // Setup visualizer bars
+        setupVisualizer();
+        
+        // Load initial data
+        fetchStreamData();
+        loadScheduleData();
+        
+        // Start metrics update interval
+        setInterval(updateLiveMetrics, 30000); // Update every 30 seconds
+        setInterval(updateLiveClock, 1000); // Update clock every second
+    }
 
-        fileInput.addEventListener('change', (e) => {
-            playlist = Array.from(e.target.files);
-            if (playlist.length > 0) {
-                currentIndex = 0;
-                loadSong(currentIndex);
-                playPauseBtn.disabled = false;
-                prevBtn.disabled = false;
-                nextBtn.disabled = false;
+    function setupEventListeners() {
+        // File input
+        elements.fileInput.addEventListener('change', handleFileUpload);
+        
+        // Player controls
+        elements.playPauseBtn.addEventListener('click', togglePlayPause);
+        elements.prevBtn.addEventListener('click', playPrevious);
+        elements.nextBtn.addEventListener('click', playNext);
+        elements.seekSlider.addEventListener('input', handleSeek);
+        elements.volumeSlider.addEventListener('input', handleVolumeChange);
+        elements.repeatBtn.addEventListener('click', toggleRepeat);
+        elements.shuffleBtn.addEventListener('click', toggleShuffle);
+        elements.clearStorageBtn.addEventListener('click', clearStorage);
+        
+        // Theme toggle
+        elements.themeToggle.addEventListener('click', toggleTheme);
+        elements.themeToggleMobile.addEventListener('click', toggleTheme);
+        
+        // Mobile menu
+        elements.menuToggle.addEventListener('click', toggleMobileMenu);
+        
+        // Refresh recent tracks
+        elements.refreshRecentBtn.addEventListener('click', fetchStreamData);
+        
+        // Audio events
+        elements.audioPlayer.addEventListener('timeupdate', updateProgress);
+        elements.audioPlayer.addEventListener('ended', handleTrackEnd);
+        elements.audioPlayer.addEventListener('error', handleAudioError);
+        
+        // Network events
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        
+        // Podcast play buttons
+        document.querySelectorAll('.podcast-play-btn').forEach(btn => {
+            btn.addEventListener('click', handlePodcastPlay);
+        });
+        
+        // Newsletter form
+        document.getElementById('newsletterForm').addEventListener('submit', handleNewsletterSubmit);
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', smoothScroll);
+        });
+        
+        // Floating buttons
+        elements.whatsappBtn.addEventListener('click', handleWhatsAppClick);
+        elements.aiAssistantBtn.addEventListener('click', toggleAIPanel);
+        elements.closeAIPanel.addEventListener('click', () => elements.aiPanel.classList.remove('active'));
+        elements.sendAI.addEventListener('click', handleAIChat);
+        elements.aiInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleAIChat();
+        });
+        
+        // Close AI panel when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!elements.aiPanel.contains(e.target) && 
+                !elements.aiAssistantBtn.contains(e.target) && 
+                elements.aiPanel.classList.contains('active')) {
+                elements.aiPanel.classList.remove('active');
             }
         });
+        
+        // Navbar scroll behavior
+        window.addEventListener('scroll', handleNavScroll);
+        
+        // Background play setup
+        setupBackgroundPlayback();
+    }
 
-        function loadSong(index) {
-            const file = playlist[index];
-            audioPlayer.src = URL.createObjectURL(file);
-            songTitleEl.textContent = file.name;
-            artistEl.textContent = 'Local Track';
-            audioPlayer.load();
+    // ======================
+    // PRELOADER & PERFORMANCE
+    // ======================
+
+    function preloadImages() {
+        const images = [
+            'https://cdn-icons-png.flaticon.com/512/9415/9415424.png',
+            'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+        ];
+        
+        images.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+    }
+
+    // ======================
+    // NAVIGATION SCROLL BEHAVIOR
+    // ======================
+
+    function handleNavScroll() {
+        const currentScroll = window.pageYOffset;
+        
+        if (currentScroll <= 0) {
+            elements.fixedNav.classList.remove('nav-hidden');
+            state.isNavHidden = false;
+            return;
         }
+        
+        if (currentScroll > state.lastScroll && !state.isNavHidden && currentScroll > 100) {
+            // Scrolling down
+            elements.fixedNav.classList.add('nav-hidden');
+            state.isNavHidden = true;
+        } else if (currentScroll < state.lastScroll && state.isNavHidden) {
+            // Scrolling up
+            elements.fixedNav.classList.remove('nav-hidden');
+            state.isNavHidden = false;
+        }
+        
+        state.lastScroll = currentScroll;
+    }
 
-        playPauseBtn.addEventListener('click', () => {
-            if (audioPlayer.paused) {
-                audioPlayer.play();
-                playIcon.classList.replace('fa-play', 'fa-pause');
-            } else {
-                audioPlayer.pause();
-                playIcon.classList.replace('fa-pause', 'fa-play');
+    // ======================
+    // FLOATING BUTTONS
+    // ======================
+
+    function handleWhatsAppClick() {
+        const phoneNumber = "+256700000000"; // Replace with actual number
+        const message = "Hello UG Online Media! I'd like to get more information.";
+        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank');
+    }
+
+    function toggleAIPanel() {
+        elements.aiPanel.classList.toggle('active');
+    }
+
+    function handleAIChat() {
+        const input = elements.aiInput.value.trim();
+        if (!input) return;
+        
+        const messages = document.querySelector('.ai-messages');
+        const userMsg = document.createElement('div');
+        userMsg.className = 'ai-message bg-purple-500/20 rounded-lg p-3 mb-2 text-right';
+        userMsg.innerHTML = `<p class="text-sm">${input}</p>`;
+        messages.appendChild(userMsg);
+        
+        // Simulate AI response
+        setTimeout(() => {
+            const responses = [
+                "Thanks for reaching out! How can I assist you with UG Online Media?",
+                "You can download our app from the download section below for exclusive content!",
+                "Our next live show starts at 6 PM. Don't miss it!",
+                "To join our community discussions, check out the community section."
+            ];
+            const response = responses[Math.floor(Math.random() * responses.length)];
+            
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'ai-message bg-purple-500/10 rounded-lg p-3 mb-2';
+            aiMsg.innerHTML = `<p class="text-sm">${response}</p>`;
+            messages.appendChild(aiMsg);
+            
+            messages.scrollTop = messages.scrollHeight;
+        }, 1000);
+        
+        elements.aiInput.value = '';
+    }
+
+    // ======================
+    // LIVE METRICS
+    // ======================
+
+    function updateLiveMetrics() {
+        // Simulate random user data (in production, fetch from API)
+        state.onlineUsers = Math.floor(Math.random() * 100) + 50;
+        state.todayUsers = Math.floor(Math.random() * 500) + 1000;
+        state.weekUsers = Math.floor(Math.random() * 2000) + 5000;
+        
+        elements.onlineNow.textContent = state.onlineUsers.toLocaleString();
+        elements.todayUsers.textContent = state.todayUsers.toLocaleString();
+        elements.weekUsers.textContent = state.weekUsers.toLocaleString();
+        elements.onlineCountMini.textContent = state.onlineUsers;
+    }
+
+    function updateLiveClock() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString();
+        elements.liveClock.textContent = timeStr;
+        elements.liveTimeMini.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // ======================
+    // BACKGROUND PLAYBACK
+    // ======================
+
+    function setupBackgroundPlayback() {
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: 'UG Online Media Radio',
+                artist: 'Live Broadcast',
+                artwork: [
+                    { src: 'https://cdn-icons-png.flaticon.com/512/9415/9415424.png', sizes: '96x96', type: 'image/png' },
+                    { src: 'https://cdn-icons-png.flaticon.com/512/9415/9415424.png', sizes: '128x128', type: 'image/png' },
+                    { src: 'https://cdn-icons-png.flaticon.com/512/9415/9415424.png', sizes: '192x192', type: 'image/png' },
+                    { src: 'https://cdn-icons-png.flaticon.com/512/9415/9415424.png', sizes: '256x256', type: 'image/png' },
+                    { src: 'https://cdn-icons-png.flaticon.com/512/9415/9415424.png', sizes: '384x384', type: 'image/png' },
+                    { src: 'https://cdn-icons-png.flaticon.com/512/9415/9415424.png', sizes: '512x512', type: 'image/png' }
+                ]
+            });
+            
+            navigator.mediaSession.setActionHandler('play', togglePlayPause);
+            navigator.mediaSession.setActionHandler('pause', togglePlayPause);
+            navigator.mediaSession.setActionHandler('previoustrack', playPrevious);
+            navigator.mediaSession.setActionHandler('nexttrack', playNext);
+        }
+        
+        // Request wake lock for background play
+        if ('wakeLock' in navigator) {
+            requestWakeLock();
+        }
+    }
+
+    async function requestWakeLock() {
+        try {
+            const wakeLock = await navigator.wakeLock.request('screen');
+            wakeLock.addEventListener('release', () => {
+                console.log('Wake Lock was released');
+            });
+        } catch (err) {
+            console.log(`${err.name}, ${err.message}`);
+        }
+    }
+
+    // ======================
+    // SERVICE WORKER FOR PWA
+    // ======================
+
+    function setupServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful');
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed:', err);
+                });
+            });
+        }
+    }
+
+    // ======================
+    // AUDIO PLAYER FUNCTIONS (existing code remains)
+    // ======================
+
+    function handleFileUpload(e) {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+        
+        files.forEach(file => {
+            if (!file.type.startsWith('audio/')) {
+                showNotification('Error', 'Please select audio files only');
+                return;
             }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const track = {
+                    id: Date.now() + Math.random(),
+                    name: file.name.replace(/\.[^/.]+$/, ""),
+                    artist: 'Unknown Artist',
+                    url: e.target.result,
+                    file: file,
+                    duration: 0,
+                    added: new Date().toISOString()
+                };
+                
+                state.playlist.push(track);
+                saveToLocalStorage();
+                updatePlaylistDisplay();
+                
+                if (state.playlist.length === files.length) {
+                    playTrack(0);
+                    showNotification('Success', `Added ${files.length} track(s) to playlist`);
+                }
+            };
+            reader.readAsDataURL(file);
         });
+    }
 
-        prevBtn.addEventListener('click', () => {
-            if (currentIndex > 0) {
-                currentIndex--;
-                loadSong(currentIndex);
-                audioPlayer.play();
-                playIcon.classList.replace('fa-play', 'fa-pause');
+    function playTrack(index) {
+        if (state.playlist.length === 0) return;
+        
+        state.currentTrackIndex = index;
+        const track = state.playlist[index];
+        
+        elements.audioPlayer.src = track.url;
+        elements.songTitleEl.textContent = track.name;
+        elements.artistEl.textContent = track.artist;
+        
+        // Update album art
+        updateAlbumArt(track);
+        
+        // Add to recent tracks
+        addToRecentTracks(track);
+        
+        // Update media session
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: track.name,
+                artist: track.artist,
+                artwork: [
+                    { src: 'https://cdn-icons-png.flaticon.com/512/9415/9415424.png', sizes: '96x96', type: 'image/png' }
+                ]
+            });
+        }
+        
+        // Play audio
+        elements.audioPlayer.play().then(() => {
+            state.isPlaying = true;
+            updatePlayButton();
+            updateNowPlaying();
+        }).catch(error => {
+            console.error('Playback error:', error);
+            showNotification('Playback Error', 'Could not play the selected file');
+        });
+    }
+
+    function togglePlayPause() {
+        if (state.playlist.length === 0) return;
+        
+        if (state.isPlaying) {
+            elements.audioPlayer.pause();
+        } else {
+            // Pause radio if playing
+            pauseRadioStream();
+            elements.audioPlayer.play();
+        }
+        state.isPlaying = !state.isPlaying;
+        updatePlayButton();
+    }
+
+    function playPrevious() {
+        if (state.playlist.length === 0) return;
+        
+        let newIndex = state.currentTrackIndex - 1;
+        if (newIndex < 0) newIndex = state.playlist.length - 1;
+        playTrack(newIndex);
+    }
+
+    function playNext() {
+        if (state.playlist.length === 0) return;
+        
+        let newIndex;
+        if (state.isShuffle) {
+            newIndex = Math.floor(Math.random() * state.playlist.length);
+            while (newIndex === state.currentTrackIndex && state.playlist.length > 1) {
+                newIndex = Math.floor(Math.random() * state.playlist.length);
             }
-        });
+        } else {
+            newIndex = state.currentTrackIndex + 1;
+            if (newIndex >= state.playlist.length) newIndex = 0;
+        }
+        playTrack(newIndex);
+    }
 
-        nextBtn.addEventListener('click', () => {
-            if (currentIndex < playlist.length - 1) {
-                currentIndex++;
-                loadSong(currentIndex);
-                audioPlayer.play();
-                playIcon.classList.replace('fa-play', 'fa-pause');
+    function handleTrackEnd() {
+        if (state.isRepeat) {
+            playTrack(state.currentTrackIndex);
+        } else {
+            playNext();
+        }
+    }
+
+    function updateProgress() {
+        if (!elements.audioPlayer.duration) return;
+        
+        const progress = (elements.audioPlayer.currentTime / elements.audioPlayer.duration) * 100;
+        elements.seekSlider.value = progress;
+        elements.currentTimeEl.textContent = formatTime(elements.audioPlayer.currentTime);
+        elements.durationEl.textContent = formatTime(elements.audioPlayer.duration);
+        
+        // Update visualizer
+        updateVisualizer(elements.audioPlayer.currentTime / elements.audioPlayer.duration);
+    }
+
+    function handleSeek(e) {
+        if (elements.audioPlayer.duration) {
+            elements.audioPlayer.currentTime = (e.target.value / 100) * elements.audioPlayer.duration;
+        }
+    }
+
+    function handleVolumeChange(e) {
+        state.volume = e.target.value / 100;
+        elements.audioPlayer.volume = state.volume;
+    }
+
+    function toggleRepeat() {
+        state.isRepeat = !state.isRepeat;
+        elements.repeatBtn.classList.toggle('text-purple-400', state.isRepeat);
+        elements.repeatBtn.classList.toggle('text-gray-500', !state.isRepeat);
+        elements.repeatBtn.title = state.isRepeat ? 'Repeat: ON' : 'Repeat: OFF';
+    }
+
+    function toggleShuffle() {
+        state.isShuffle = !state.isShuffle;
+        elements.shuffleBtn.classList.toggle('text-purple-400', state.isShuffle);
+        elements.shuffleBtn.classList.toggle('text-gray-500', !state.isShuffle);
+        elements.shuffleBtn.title = state.isShuffle ? 'Shuffle: ON' : 'Shuffle: OFF';
+    }
+
+    // ======================
+    // LOCAL STORAGE FUNCTIONS
+    // ======================
+
+    function saveToLocalStorage() {
+        try {
+            // Save playlist
+            const playlistData = state.playlist.map(track => ({
+                id: track.id,
+                name: track.name,
+                artist: track.artist,
+                url: track.url,
+                added: track.added
+            }));
+            localStorage.setItem('ugmedia_playlist', JSON.stringify(playlistData));
+            
+            // Save settings
+            const settings = {
+                volume: state.volume,
+                isShuffle: state.isShuffle,
+                isRepeat: state.isRepeat,
+                theme: state.theme
+            };
+            localStorage.setItem('ugmedia_settings', JSON.stringify(settings));
+            
+            updateStorageStatus();
+        } catch (error) {
+            console.error('Error saving to localStorage:', error);
+        }
+    }
+
+    function loadFromLocalStorage() {
+        try {
+            // Load playlist
+            const playlistData = localStorage.getItem('ugmedia_playlist');
+            if (playlistData) {
+                state.playlist = JSON.parse(playlistData);
+                updatePlaylistDisplay();
             }
-        });
-
-        audioPlayer.addEventListener('timeupdate', () => {
-            if (audioPlayer.duration) {
-                const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-                seekSlider.value = progress;
-                currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
-                durationEl.textContent = formatTime(audioPlayer.duration);
+            
+            // Load settings
+            const settingsData = localStorage.getItem('ugmedia_settings');
+            if (settingsData) {
+                const settings = JSON.parse(settingsData);
+                state.volume = settings.volume || 0.7;
+                state.isShuffle = settings.isShuffle || false;
+                state.isRepeat = settings.isRepeat || false;
+                state.theme = settings.theme || 'dark';
+                
+                // Apply settings
+                elements.audioPlayer.volume = state.volume;
+                elements.volumeSlider.value = state.volume * 100;
+                if (state.isRepeat) toggleRepeat();
+                if (state.isShuffle) toggleShuffle();
+                applyTheme(state.theme);
             }
-        });
+            
+            updateStorageStatus();
+        } catch (error) {
+            console.error('Error loading from localStorage:', error);
+        }
+    }
 
-        seekSlider.addEventListener('input', () => {
-            if (audioPlayer.duration) {
-                audioPlayer.currentTime = (seekSlider.value / 100) * audioPlayer.duration;
-            }
-        });
+    function clearStorage() {
+        if (confirm('Are you sure you want to clear all saved tracks?')) {
+            state.playlist = [];
+            state.currentTrackIndex = 0;
+            elements.audioPlayer.src = '';
+            state.isPlaying = false;
+            updatePlayButton();
+            updatePlaylistDisplay();
+            updateStorageStatus();
+            localStorage.removeItem('ugmedia_playlist');
+            showNotification('Playlist Cleared', 'All tracks have been removed');
+        }
+    }
 
-        function formatTime(time) {
-            const mins = Math.floor(time / 60);
-            const secs = Math.floor(time % 60);
-            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    // ======================
+    // UI UPDATE FUNCTIONS
+    // ======================
+
+    function updatePlayButton() {
+        elements.playIcon.className = state.isPlaying ? 'fas fa-pause text-xl' : 'fas fa-play text-xl';
+        elements.playPauseBtn.disabled = state.playlist.length === 0;
+        elements.prevBtn.disabled = state.playlist.length === 0;
+        elements.nextBtn.disabled = state.playlist.length === 0;
+    }
+
+    function updatePlaylistDisplay() {
+        elements.playlistContainer.innerHTML = '';
+        
+        if (state.playlist.length === 0) {
+            elements.playlistContainer.innerHTML = `
+                <div class="text-center py-4 text-gray-500">
+                    <i class="fas fa-music mb-2"></i>
+                    <p class="text-sm font-bold">No tracks in playlist</p>
+                </div>
+            `;
+            return;
+        }
+        
+        state.playlist.forEach((track, index) => {
+            const isActive = index === state.currentTrackIndex;
+            const item = document.createElement('div');
+            item.className = `flex items-center space-x-3 p-2 rounded-lg cursor-pointer transition-all ${isActive ? 'bg-purple-500/20 border border-purple-500/30' : 'bg-white/5 hover:bg-white/10'}`;
+            item.innerHTML = `
+                <div class="w-8 h-8 ${isActive ? 'bg-purple-500' : 'bg-white/10'} rounded-lg flex items-center justify-center text-${isActive ? 'white' : 'gray-400'} flex-shrink-0">
+                    <i class="fas fa-music text-sm"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="font-bold text-sm truncate ${isActive ? 'text-white' : 'text-gray-300'}">${track.name}</div>
+                    <div class="text-xs text-gray-400 truncate font-medium">${track.artist}</div>
+                </div>
+                <button class="playlist-remove-btn text-gray-500 hover:text-red-400 transition-colors" data-index="${index}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            item.addEventListener('click', () => playTrack(index));
+            elements.playlistContainer.appendChild(item);
+        });
+        
+        // Add event listeners to remove buttons
+        document.querySelectorAll('.playlist-remove-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const index = parseInt(btn.dataset.index);
+                removeTrack(index);
+            });
+        });
+        
+        elements.playlistCount.textContent = `${state.playlist.length} track${state.playlist.length !== 1 ? 's' : ''}`;
+    }
+
+    function removeTrack(index) {
+        state.playlist.splice(index, 1);
+        if (state.currentTrackIndex >= index && state.currentTrackIndex > 0) {
+            state.currentTrackIndex--;
+        }
+        saveToLocalStorage();
+        updatePlaylistDisplay();
+        if (state.playlist.length > 0) {
+            playTrack(state.currentTrackIndex);
+        } else {
+            elements.audioPlayer.src = '';
+            state.isPlaying = false;
+            updatePlayButton();
+        }
+    }
+
+    function updateStorageStatus() {
+        const count = state.playlist.length;
+        elements.storageUsage.textContent = `${count}/50`;
+        elements.storageStatus.className = `ml-auto text-xs font-bold ${count > 0 ? 'bg-green-500/20 text-green-300' : 'bg-white/10 text-gray-400'} px-3 py-1 rounded-full`;
+    }
+
+    function updateAlbumArt(track) {
+        elements.albumArtIcon.classList.remove('hidden');
+        elements.albumArtImage.classList.add('hidden');
+        elements.albumArtImage.src = '';
+        
+        // You can implement actual album art extraction here
+        const colors = [
+            'from-purple-500/30 to-pink-500/30',
+            'from-blue-500/30 to-cyan-500/30',
+            'from-green-500/30 to-teal-500/30',
+            'from-orange-500/30 to-red-500/30'
+        ];
+        const hash = track.name.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+        const colorIndex = hash % colors.length;
+        elements.albumArtIcon.parentElement.className = `w-20 h-20 rounded-xl flex items-center justify-center text-3xl text-white bg-gradient-to-br ${colors[colorIndex]} shadow-xl flex-shrink-0 overflow-hidden`;
+    }
+
+    // ======================
+    // THEME MANAGEMENT
+    // ======================
+
+    function toggleTheme() {
+        state.theme = state.theme === 'dark' ? 'light' : 'dark';
+        applyTheme(state.theme);
+        saveToLocalStorage();
+        showNotification('Theme Changed', `Switched to ${state.theme} theme`);
+    }
+
+    function applyTheme(theme) {
+        document.body.classList.toggle('light-theme', theme === 'light');
+        document.body.classList.toggle('dark', theme === 'dark');
+        
+        const icon = theme === 'dark' ? 'fa-moon' : 'fa-sun';
+        elements.themeToggle.innerHTML = `<i class="fas ${icon} mr-2"></i> Theme`;
+        elements.themeToggleMobile.innerHTML = `<i class="fas ${icon} mr-2"></i> Toggle Theme`;
+    }
+
+    // ======================
+    // NOTIFICATION SYSTEM
+    // ======================
+
+    function showNotification(title, message) {
+        elements.notificationTitle.textContent = title;
+        elements.notificationMessage.textContent = message;
+        elements.notification.classList.add('show');
+        
+        setTimeout(() => {
+            elements.notification.classList.remove('show');
+        }, 3000);
+    }
+
+    // ======================
+    // NETWORK & STREAM FUNCTIONS
+    // ======================
+
+    function updateOnlineStatus() {
+        state.online = navigator.onLine;
+        
+        if (!state.online) {
+            elements.offlineIndicator.classList.add('show');
+            showNotification('Offline Mode', 'Playing from local storage');
+            pauseRadioStream();
+        } else {
+            elements.offlineIndicator.classList.remove('show');
+            fetchStreamData();
+        }
+        
+        updateStreamStatus();
+    }
+
+    function updateStreamStatus() {
+        const status = state.online ? 'Streaming Live' : 'Offline Mode';
+        const color = state.online ? 'green' : 'red';
+        elements.streamStatus.innerHTML = `
+            <div class="inline-flex items-center space-x-2 bg-black/50 px-3 py-1 rounded-full">
+                <div class="w-2 h-2 bg-${color}-500 rounded-full ${state.online ? 'animate-pulse' : ''}"></div>
+                <span class="font-bold">${status}</span>
+            </div>
+        `;
+    }
+
+    async function fetchStreamData() {
+        if (!state.online) return;
+        
+        try {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            updateNowPlaying({
+                title: 'Top Ugandan Hits Mix',
+                artist: 'DJ Mark',
+                albumArt: '',
+                listeners: 10542
+            });
+        } catch (error) {
+            console.error('Error fetching stream data:', error);
+            updateNowPlaying({
+                title: 'Top Ugandan Hits Mix',
+                artist: 'DJ Mark',
+                albumArt: '',
+                listeners: 10542
+            });
+        }
+    }
+
+    function updateNowPlaying(data = {}) {
+        document.getElementById('current-song-radio').textContent = data.title || 'Top Ugandan Hits Mix';
+        document.getElementById('current-artist-radio').textContent = data.artist || 'UG Online Media';
+        
+        if (data.listeners) {
+            document.querySelector('#streamStatus span').innerHTML = 
+                `<span class="font-bold">${data.listeners.toLocaleString()}</span> listeners`;
+        }
+    }
+
+    function pauseRadioStream() {
+        // Note: Cross-origin restrictions apply
+    }
+
+    // ======================
+    // SCHEDULE MANAGEMENT
+    // ======================
+
+    function initializeSchedule() {
+        state.schedule = [
+            { time: '06:00 - 09:00', title: 'Morning Show with DJ Mark', host: 'DJ Mark', category: 'music', color: 'purple' },
+            { time: '09:00 - 12:00', title: 'Top 40 Countdown', host: 'Sarah K.', category: 'music', color: 'pink' },
+            { time: '12:00 - 14:00', title: 'News Hour', host: 'News Team', category: 'news', color: 'blue' },
+            { time: '14:00 - 17:00', title: 'Afternoon Drive', host: 'Mike J.', category: 'music', color: 'green' },
+            { time: '17:00 - 19:00', title: 'Sports Roundup', host: 'Coach Wilson', category: 'sports', color: 'orange' },
+            { time: '19:00 - 22:00', title: 'Evening Vibes', host: 'DJ Harmony', category: 'music', color: 'purple' }
+        ];
+        
+        updateScheduleDisplay();
+        setInterval(updateScheduleDisplay, 60000);
+    }
+
+    function updateScheduleDisplay() {
+        const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+        
+        elements.currentTimeDisplay.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        elements.scheduleList.innerHTML = '';
+        
+        state.schedule.forEach((show, index) => {
+            const [start, end] = show.time.split(' - ');
+            const startMinutes = timeToMinutes(start);
+            const endMinutes = timeToMinutes(end);
+            
+            const isLive = currentTime >= startMinutes && currentTime <= endMinutes;
+            const isNext = currentTime < startMinutes && 
+                          (index === 0 || currentTime > timeToMinutes(state.schedule[index-1].time.split(' - ')[1]));
+            
+            const showElement = document.createElement('div');
+            showElement.className = `p-4 rounded-2xl transition-all duration-300 ${isLive ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-500/40' : 'bg-white/5 border border-white/10'}`;
+            
+            showElement.innerHTML = `
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <div class="font-bold text-${show.color}-400">${show.time}</div>
+                            ${isLive ? '<span class="live-badge text-xs font-bold">LIVE NOW</span>' : ''}
+                            ${isNext && !isLive ? '<span class="text-xs font-bold bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full">NEXT</span>' : ''}
+                        </div>
+                        <div class="font-bold text-white mb-1">${show.title}</div>
+                        <div class="text-sm text-gray-400 font-medium">With ${show.host}</div>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-${show.color}-500/20 flex items-center justify-center text-${show.color}-300 flex-shrink-0">
+                        <i class="fas fa-${getCategoryIcon(show.category)}"></i>
+                    </div>
+                </div>
+            `;
+            
+            elements.scheduleList.appendChild(showElement);
+        });
+    }
+
+    function timeToMinutes(time) {
+        const [hours, minutes] = time.split(':').map(Number);
+        return hours * 60 + minutes;
+    }
+
+    function getCategoryIcon(category) {
+        const icons = {
+            music: 'music',
+            news: 'newspaper',
+            sports: 'futbol',
+            talk: 'microphone-alt'
+        };
+        return icons[category] || 'broadcast-tower';
+    }
+
+    // ======================
+    // RECENT TRACKS
+    // ======================
+
+    function addToRecentTracks(track) {
+        const recentTrack = {
+            ...track,
+            playedAt: new Date().toISOString()
+        };
+        
+        state.recentTracks.unshift(recentTrack);
+        if (state.recentTracks.length > 10) {
+            state.recentTracks = state.recentTracks.slice(0, 10);
+        }
+        
+        updateRecentTracksDisplay();
+    }
+
+    function updateRecentTracks(tracks) {
+        state.recentTracks = tracks.slice(0, 10);
+        updateRecentTracksDisplay();
+    }
+
+    function updateRecentTracksDisplay() {
+        elements.recentTracksContainer.innerHTML = '';
+        
+        if (state.recentTracks.length === 0) {
+            elements.recentTracksContainer.innerHTML = `
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-history text-2xl mb-3"></i>
+                    <p class="font-bold">No recent tracks</p>
+                </div>
+            `;
+            return;
+        }
+        
+        state.recentTracks.forEach(track => {
+            const playedAt = new Date(track.playedAt);
+            const timeAgo = getTimeAgo(playedAt);
+            
+            const trackElement = document.createElement('div');
+            trackElement.className = 'flex items-center space-x-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer';
+            trackElement.innerHTML = `
+                <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-300 flex-shrink-0">
+                    <i class="fas fa-music"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-bold text-white truncate">${track.title || track.name}</div>
+                    <div class="text-xs text-gray-400 truncate font-medium">${track.artist} • ${timeAgo}</div>
+                </div>
+            `;
+            
+            trackElement.addEventListener('click', () => {
+                const index = state.playlist.findIndex(t => t.id === track.id);
+                if (index !== -1) {
+                    playTrack(index);
+                }
+            });
+            
+            elements.recentTracksContainer.appendChild(trackElement);
+        });
+    }
+
+    // ======================
+    // VISUAL EFFECTS
+    // ======================
+
+    function setupVisualizer() {
+        const vuMeter = document.getElementById('vu-meter');
+        vuMeter.innerHTML = '';
+        
+        for (let i = 0; i < 40; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'vu-bar';
+            bar.style.setProperty('--i', i);
+            vuMeter.appendChild(bar);
+        }
+    }
+
+    function updateVisualizer(progress) {
+        const bars = document.querySelectorAll('.vu-bar');
+        bars.forEach((bar, i) => {
+            const intensity = Math.sin(progress * Math.PI * 2 + i * 0.3) * 0.5 + 0.5;
+            bar.style.height = `${20 + intensity * 50}%`;
+            bar.style.opacity = 0.3 + intensity * 0.4;
+        });
+    }
+
+    function setupBackgroundParticles() {
+        const container = document.getElementById('particles');
+        const particleCount = window.innerWidth < 768 ? 15 : 30;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            const size = Math.random() * 100 + 50;
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            const duration = Math.random() * 20 + 10;
+            const delay = Math.random() * 5;
+            
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${x}%`;
+            particle.style.top = `${y}%`;
+            particle.style.animation = `float ${duration}s ease-in-out ${delay}s infinite`;
+            
+            container.appendChild(particle);
+        }
+    }
+
+    // ======================
+    // MOBILE MENU
+    // ======================
+
+    function toggleMobileMenu() {
+        elements.mobileMenu.classList.toggle('active');
+        document.body.style.overflow = elements.mobileMenu.classList.contains('active') ? 'hidden' : '';
+    }
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!elements.mobileMenu.contains(e.target) && 
+            !elements.menuToggle.contains(e.target) && 
+            elements.mobileMenu.classList.contains('active')) {
+            toggleMobileMenu();
         }
     });
+
+    // ======================
+    // UTILITY FUNCTIONS
+    // ======================
+
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function getTimeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        
+        if (seconds < 60) return 'just now';
+        if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+        return `${Math.floor(seconds / 86400)}d ago`;
+    }
+
+    function updateCurrentTimeDisplay() {
+        const now = new Date();
+        elements.currentTimeDisplay.textContent = now.toLocaleTimeString([], { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+    }
+
+    function smoothScroll(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+            window.scrollTo({
+                top: targetElement.offsetTop - 120, // Adjusted for fixed navbar
+                behavior: 'smooth'
+            });
+            
+            // Close mobile menu if open
+            if (elements.mobileMenu.classList.contains('active')) {
+                toggleMobileMenu();
+            }
+        }
+    }
+
+    function handleAudioError(e) {
+        console.error('Audio error:', e);
+        showNotification('Playback Error', 'Unable to play the selected file. It may be corrupted or in an unsupported format.');
+        playNext();
+    }
+
+    function handlePodcastPlay(e) {
+        const button = e.currentTarget;
+        const url = button.dataset.url;
+        const title = button.dataset.title;
+        const artist = button.dataset.artist;
+        
+        // Pause current playback
+        if (state.isPlaying) {
+            elements.audioPlayer.pause();
+            state.isPlaying = false;
+            updatePlayButton();
+        }
+        
+        showNotification('Podcast', `Playing: ${title} - ${artist}`);
+        
+        // Add to recent tracks
+        addToRecentTracks({
+            id: Date.now(),
+            name: title,
+            artist: artist,
+            url: url,
+            added: new Date().toISOString()
+        });
+    }
+
+    async function handleNewsletterSubmit(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('subscriberEmail').value;
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoading = document.getElementById('btnLoading');
+        const formMessage = document.getElementById('formMessage');
+        
+        if (!email || !email.includes('@')) {
+            formMessage.innerHTML = '<span class="text-red-300 font-bold">Please enter a valid email address.</span>';
+            return;
+        }
+        
+        // Show loading state
+        btnText.textContent = 'Subscribing...';
+        btnLoading.classList.remove('hidden');
+        submitBtn.disabled = true;
+        
+        try {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Show success
+            formMessage.innerHTML = '<span class="text-green-300 font-bold">Thank you! You\'ve been subscribed to UG Online Media updates.</span>';
+            btnText.textContent = 'Subscribed!';
+            
+            // Save to localStorage
+            const subscribers = JSON.parse(localStorage.getItem('ugmedia_subscribers') || '[]');
+            subscribers.push({
+                email: email,
+                subscribedAt: new Date().toISOString()
+            });
+            localStorage.setItem('ugmedia_subscribers', JSON.stringify(subscribers));
+            
+            // Reset form
+            setTimeout(() => {
+                document.getElementById('newsletterForm').reset();
+                btnText.textContent = 'Subscribe to Updates';
+                btnLoading.classList.add('hidden');
+                submitBtn.disabled = false;
+                formMessage.innerHTML = '';
+            }, 3000);
+            
+        } catch (error) {
+            formMessage.innerHTML = '<span class="text-red-300 font-bold">Subscription failed. Please try again.</span>';
+            btnText.textContent = 'Subscribe to Updates';
+            btnLoading.classList.add('hidden');
+            submitBtn.disabled = false;
+        }
+    }
+
+    // ======================
+    // MOCK DATA LOADING
+    // ======================
+
+    function loadScheduleData() {
+        setTimeout(() => {
+            updateScheduleDisplay();
+            updateRecentTracks([
+                {
+                    id: 1,
+                    title: 'Top Ugandan Hits Mix',
+                    artist: 'DJ Mark',
+                    playedAt: new Date(Date.now() - 300000).toISOString()
+                },
+                {
+                    id: 2,
+                    title: 'Morning Gospel Hour',
+                    artist: 'Rev. James',
+                    playedAt: new Date(Date.now() - 900000).toISOString()
+                },
+                {
+                    id: 3,
+                    title: 'Tech Talk Tuesday',
+                    artist: 'Sarah K.',
+                    playedAt: new Date(Date.now() - 1800000).toISOString()
+                }
+            ]);
+        }, 1000);
+    }
+
+    // ======================
+    // ERROR BOUNDARY
+    // ======================
+
+    window.addEventListener('error', function(e) {
+        console.error('Global error:', e.error);
+        showNotification('System Error', 'An unexpected error occurred. Please refresh the page.');
+    });
+
+    // ======================
+    // INITIAL RENDER
+    // ======================
+
+    // Initial updates
+    updatePlayButton();
+    updatePlaylistDisplay();
+    updateStorageStatus();
+    updateStreamStatus();
+    updateLiveMetrics();
+    updateLiveClock();
+
 </script>
+
+<!-- Add CSS animations -->
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate-fadeIn {
+        animation: fadeIn 0.6s ease-out forwards;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0) translateX(0); }
+        50% { transform: translateY(-20px) translateX(10px); }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .modern-card {
+            border-radius: 20px;
+        }
+        
+        .big-bold {
+            font-size: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.75rem;
+        }
+        
+        .grid-cols-2 {
+            grid-template-columns: 1fr;
+        }
+        
+        footer .grid {
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+        
+        .team-card {
+            padding: 1.5rem;
+        }
+        
+        .download-card {
+            padding: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 640px) {
+        body {
+            padding: 12px;
+        }
+        
+        .modern-card {
+            padding: 16px;
+        }
+        
+        .player-controls {
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .volume-control {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .floating-btn {
+            width: 45px;
+            height: 45px;
+            bottom: 15px;
+            right: 15px;
+            font-size: 20px;
+        }
+        
+        .whatsapp-btn {
+            bottom: 70px;
+        }
+        
+        .ai-assistant-btn {
+            bottom: 130px;
+        }
+        
+        .ai-panel {
+            width: calc(100vw - 30px);
+            right: 15px;
+            bottom: 180px;
+        }
+    }
+</style>
 </body>
 </html>
